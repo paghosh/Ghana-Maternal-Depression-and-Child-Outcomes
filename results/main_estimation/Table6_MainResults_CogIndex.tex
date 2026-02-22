@@ -1,0 +1,40 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Effect of Maternal Depression on Child Cognitive Development}
+\begin{tabular}{l*{6}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
+            &\multicolumn{1}{c}{OLS}&\multicolumn{1}{c}{OLS}&\multicolumn{1}{c}{OLS}&\multicolumn{1}{c}{OLS}&\multicolumn{1}{c}{EA FE}&\multicolumn{1}{c}{Child FE}\\
+\midrule
+Maternal depression (std. K10)&      -0.007         &      -0.010         &      -0.003         &      -0.003         &       0.006         &       0.014         \\
+            &     (0.010)         &     (0.010)         &     (0.032)         &     (0.032)         &     (0.049)         &     (0.019)         \\
+\addlinespace
+Child age   &                     &       0.055\sym{***}&       0.018\sym{*}  &       0.017\sym{*}  &       0.016         &       0.009         \\
+            &                     &     (0.003)         &     (0.010)         &     (0.010)         &     (0.011)         &     (0.015)         \\
+\addlinespace
+Mother's age&                     &                     &       0.000         &       0.001         &       0.003         &                     \\
+            &                     &                     &     (0.003)         &     (0.003)         &     (0.004)         &                     \\
+\addlinespace
+Mother's education (years)&                     &                     &       0.016         &       0.015         &       0.032\sym{***}&                     \\
+            &                     &                     &     (0.011)         &     (0.012)         &     (0.012)         &                     \\
+\addlinespace
+Household size&                     &                     &                     &      -0.005         &      -0.004         &       0.022\sym{*}  \\
+            &                     &                     &                     &     (0.016)         &     (0.021)         &     (0.013)         \\
+\addlinespace
+Log per capita consumption&                     &                     &                     &       0.084\sym{*}  &       0.130         &                     \\
+            &                     &                     &                     &     (0.047)         &     (0.082)         &                     \\
+\midrule
+EA/Child FE &          No         &          No         &          No         &          No         &         Yes         &    Child FE         \\
+Wave FE     &          No         &          No         &          No         &          No         &         Yes         &         Yes         \\
+Observations&      11,981         &      11,981         &       1,243         &       1,242         &       1,213         &       6,583         \\
+$R^2$       &       0.000         &       0.039         &       0.005         &       0.008         &       0.213         &       0.482         \\
+Adj. $R^2$  &      -0.000         &       0.039         &       0.001         &       0.003         &       0.028         &       0.059         \\
+\bottomrule
+\multicolumn{7}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{7}{l}{\footnotesize Standard errors clustered at the EA level in parentheses.}\\
+\multicolumn{7}{l}{\footnotesize Dependent variable: composite cognitive index (average of standardized}\\
+\multicolumn{7}{l}{\footnotesize Raven's, digit span forward/backward, math, and English scores).}\\
+\multicolumn{7}{l}{\footnotesize *** p$<$0.01, ** p$<$0.05, * p$<$0.1}\\
+\multicolumn{7}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

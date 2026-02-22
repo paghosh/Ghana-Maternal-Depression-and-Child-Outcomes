@@ -1,0 +1,26 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Effect of Maternal Depression on Child Anthropometry}
+\begin{tabular}{l*{4}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+            &\multicolumn{1}{c}{HAZ}&\multicolumn{1}{c}{WAZ}&\multicolumn{1}{c}{HAZ}&\multicolumn{1}{c}{WAZ}\\
+\midrule
+Maternal depression (std. K10)&       0.030         &       0.026         &                     &                     \\
+            &     (0.025)         &     (0.028)         &                     &                     \\
+\addlinespace
+Mother depressed (K10 $\geq$ 20)&                     &                     &       0.077         &       0.087\sym{*}  \\
+            &                     &                     &     (0.057)         &     (0.047)         \\
+\addlinespace
+Controls    &         Yes         &         Yes         &         Yes         &         Yes         \\
+\midrule
+Observations&       1,329         &       1,333         &       1,329         &       1,333         \\
+$R^2$       &       0.738         &       0.744         &       0.738         &       0.745         \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize Standard errors clustered at the EA level in parentheses.}\\
+\multicolumn{5}{l}{\footnotesize HAZ = height-for-age z-score. WAZ = weight-for-age z-score.}\\
+\multicolumn{5}{l}{\footnotesize *** p$<$0.01, ** p$<$0.05, * p$<$0.1}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

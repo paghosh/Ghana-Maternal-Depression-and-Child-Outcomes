@@ -1,0 +1,241 @@
+\documentclass[12pt]{article}
+
+% Page layout
+\usepackage[margin=1in, headheight=15pt]{geometry}
+\usepackage{lscape}
+
+% Tables
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{array}
+
+% Fonts and encoding
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}  % Palatino font for professional look
+
+% Math
+\usepackage{amsmath}
+
+% Spacing
+\usepackage{setspace}
+\onehalfspacing
+
+% Headers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+\lhead{\footnotesize Ghosh (2026) --- Maternal Depression and Child Cognitive Development}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Hyperlinks
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+
+% Table and figure numbering
+\usepackage{caption}
+\captionsetup{labelfont=bf, font=small}
+
+% Allow float placement
+\usepackage{float}
+
+% Title
+\title{\textbf{Maternal Depression, Parental Investment, and Child Cognitive Development in Ghana} \\[0.5em]
+\large Tables and Results}
+\author{Pallab Ghosh \\
+\textit{University of Oklahoma}}
+\date{February 2026 \\ Draft 1}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\vfill
+\noindent\textbf{Data Source:} Ghana Socioeconomic Panel Survey (GSPS), Waves 1--3 (2009, 2012, 2018). \\
+\noindent\textbf{Note:} All regression tables report standard errors clustered at the enumeration area (EA) level in parentheses. Significance levels: *** $p<0.01$, ** $p<0.05$, * $p<0.10$.
+
+\clearpage
+\tableofcontents
+\clearpage
+
+%===============================================================================
+%   PART I: SUMMARY STATISTICS
+%===============================================================================
+\section{Summary Statistics}
+
+%--- Table 1 ---
+\input{Table1_SummaryStats.tex}
+
+\clearpage
+
+%--- Table 2 ---
+{\small
+\input{Table2_BalanceByDepression.tex}
+}
+
+\clearpage
+
+%--- Table 3 ---
+\begin{landscape}
+{\footnotesize
+\input{Table3_SummaryByWave.tex}
+}
+\end{landscape}
+
+%--- Table 4 ---
+\input{Table4_DepressionDistribution.tex}
+
+\clearpage
+
+%--- Table 5 ---
+\begin{landscape}
+{\footnotesize
+\input{Table5_Correlations.tex}
+}
+\end{landscape}
+
+
+%===============================================================================
+%   PART II: MAIN ESTIMATION RESULTS
+%===============================================================================
+\section{Main Estimation Results}
+
+%--- Table 6 ---
+\input{Table6_MainResults_CogIndex.tex}
+
+\clearpage
+
+%--- Table 6A (Revised): Full-Sample EA FE Specifications ---
+\input{Table6_Revised_MainResults.tex}
+
+\clearpage
+
+%--- Table 6B: Additional Specifications (Full Sample) ---
+\input{Table6b_AdditionalSpecs.tex}
+
+\clearpage
+
+%--- Table 6C: Heterogeneity by Age Group (Full Sample) ---
+\input{Table6c_HeterogeneityAge_FullSample.tex}
+
+\clearpage
+
+%--- Table 7 ---
+\input{Table7_ResultsByTest.tex}
+
+\clearpage
+
+%--- Table 8 ---
+\input{Table8_BinaryDepression.tex}
+
+\clearpage
+
+%--- Table 9 ---
+\input{Table9_DepressionSeverity.tex}
+
+\clearpage
+
+%--- Table 10 ---
+\input{Table10_Anthropometry.tex}
+
+\clearpage
+
+%--- Table 11 ---
+\input{Table11_HeterogeneityAge.tex}
+
+\clearpage
+
+%--- Table 12 ---
+\input{Table12_HeterogeneityGender.tex}
+
+\clearpage
+
+
+%===============================================================================
+%   PART III: MECHANISM / CHANNEL ANALYSIS
+%===============================================================================
+\section{Mechanism and Channel Analysis}
+
+%--- Table 13 ---
+\input{Table13_Channel1_TimeInvestment.tex}
+
+\clearpage
+
+%--- Table 14 ---
+\input{Table14_Channel2_FinancialInvestment.tex}
+
+\clearpage
+
+%--- Table 15 ---
+\input{Table15_Channel3_Nutrition.tex}
+
+\clearpage
+
+%--- Table 16 ---
+\input{Table16_Channel4_StimulationQuality.tex}
+
+\clearpage
+
+%--- Table 17 ---
+\input{Table17_MediationAnalysis.tex}
+
+\clearpage
+
+%--- Table 18 ---
+\input{Table18_ChildHealthChannel.tex}
+
+\clearpage
+
+
+%===============================================================================
+%   PART IV: ROBUSTNESS CHECKS (APPENDIX)
+%===============================================================================
+\section{Appendix: Robustness Checks}
+
+%--- Table A1 ---
+\input{TableA1_RobDepMeasure.tex}
+
+\clearpage
+
+%--- Table A2 ---
+\input{TableA2_RobFESpecs.tex}
+
+\clearpage
+
+%--- Table A3 ---
+\input{TableA3_RobSubsamples.tex}
+
+\clearpage
+
+%--- Table A4 ---
+\input{TableA4_RobValueAdded.tex}
+
+\clearpage
+
+%--- Table A5 ---
+\input{TableA5_RobPlacebo.tex}
+
+\clearpage
+
+%--- Table A6 ---
+\input{TableA6_RobNonLinear.tex}
+
+\clearpage
+
+%--- Table A7 ---
+\input{TableA7_RobIPW.tex}
+
+\clearpage
+
+%--- Table A8 ---
+\input{TableA8_RobAltCogOutcomes.tex}
+
+\clearpage
+
+%--- Table A9 ---
+\input{TableA9_RobClustering.tex}
+
+
+\end{document}

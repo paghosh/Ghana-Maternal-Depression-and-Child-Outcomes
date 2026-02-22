@@ -1,0 +1,1105 @@
+\documentclass[12pt,a4paper]{article}
+
+% ============================================================
+% PACKAGES
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{mathpazo}                   % Palatino font (journal standard)
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}\onehalfspacing
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}                   % Professional tables
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{threeparttable}             % Table notes
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[labelfont=bf,font=small]{caption}
+\usepackage{natbib}                     % Bibliography
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{pdflscape}                  % Landscape pages
+
+% ============================================================
+% TITLE
+% ============================================================
+\title{\textbf{Maternal Depression, Parental Investment, and \\[6pt] Child Cognitive Development in Ghana} \\[12pt]
+\large Summary of Empirical Results}
+
+\author{Pallab Ghosh\thanks{Department of Economics, University of Oklahoma. Email: pghosh@ou.edu}}
+
+\date{February 2026 \\ \small Draft 1 --- Results Summary}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\noindent This document summarizes the empirical results from a study examining the relationship between maternal depression and child cognitive development in Ghana. Using three waves of the Ghana Socioeconomic Panel Survey (GSPS, 2009--2018), we estimate the effect of maternal depression---measured by the Kessler Psychological Distress Scale (K10)---on a composite cognitive index constructed from Raven's progressive matrices, digit span, math, and English tests. Our main finding is that maternal depression has no statistically significant direct effect on child cognitive outcomes across a wide range of specifications, including OLS, enumeration area (EA) fixed effects, and child fixed effects models. In our preferred specification---EA fixed effects on the full sample ($N = 11{,}958$)---a one standard deviation increase in K10 depression is associated with a 0.002 SD change in child cognition ($p = 0.834$). This precisely estimated null holds across alternative depression measures (binary, severity categories, lagged, persistent), individual cognitive tests, age-group subsamples, and child fixed effects models. The one exception is a significant \textit{positive} effect among children aged 10--14 ($\hat{\beta} = 0.030$, $p = 0.047$). We find a significant negative effect of depression on parental time investment: a one standard deviation increase in K10 reduces reading/homework time by 0.28 hours per day ($p<0.05$), but this does not translate into cognitive deficits. Results are robust to alternative fixed effects specifications, subsample analyses, non-linear models, attrition correction, and alternative cognitive outcome measures. \\[6pt]
+\noindent \textit{JEL Classification}: I15, J13, O15 \\
+\noindent \textit{Keywords}: maternal depression, child cognitive development, parental investment, K10, Ghana
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ============================================================
+% NOTATION AND VARIABLE CONSTRUCTION
+% ============================================================
+\section{Notation and Variable Construction}
+\label{sec:notation}
+
+This section defines all variables and notation used throughout the document. Readers should refer back to this section when interpreting regression tables.
+
+\subsection{Subscripts and Indexing}
+
+\begin{itemize}[nosep]
+    \item $i$ indexes \textbf{children} (the unit of observation in most regressions).
+    \item $m(i)$ indexes the \textbf{mother} of child $i$. For brevity, we write $m$ when the mapping is clear.
+    \item $h(i)$ indexes the \textbf{household} in which child $i$ resides. We write $h$ for brevity.
+    \item $e(i)$ indexes the \textbf{enumeration area} (EA)---the primary sampling unit in the GSPS, roughly equivalent to a village or urban neighborhood.
+    \item $t \in \{1, 2, 3\}$ indexes the \textbf{survey wave}: Wave~1 (2009), Wave~2 (2012), Wave~3 (2018).
+\end{itemize}
+
+\subsection{Dependent Variables}
+
+\subsubsection*{Composite Cognitive Index ($\textit{CogIndex}_{it}$)}
+
+The primary outcome is a composite measure of child cognitive ability. It is constructed as follows:
+
+\begin{enumerate}[nosep]
+    \item \textbf{Individual test scores.} Five cognitive tests are administered across the GSPS waves:
+    \begin{itemize}[nosep]
+        \item \textit{Raven's Progressive Matrices} ($\textit{Ravens}_{it}$): Number of correct answers out of 12 pattern-recognition items. Measures non-verbal fluid intelligence.
+        \item \textit{Digit Span Forward} ($\textit{DSF}_{it}$): Highest level achieved (0--8) in a task requiring the child to repeat sequences of digits in order. Measures short-term memory.
+        \item \textit{Digit Span Backward} ($\textit{DSB}_{it}$): Highest level achieved (0--7) in a task requiring the child to repeat digit sequences in reverse order. Measures working memory / executive function.
+        \item \textit{Math} ($\textit{Math}_{it}$): Number correct (0--8) on age-appropriate arithmetic problems.
+        \item \textit{English} ($\textit{English}_{it}$): Number correct (0--7) on English reading comprehension items.
+    \end{itemize}
+    Not all tests are administered in every wave or to every child (e.g., math and English are primarily available in Wave~3).
+
+    \item \textbf{Standardization.} Each raw test score $Y_{it}^{k}$ for test $k$ is standardized to have mean zero and unit standard deviation within the pooled sample:
+    \[
+    \widetilde{Y}_{it}^{k} = \frac{Y_{it}^{k} - \bar{Y}^{k}}{\sigma_{Y^{k}}}
+    \]
+    where $\bar{Y}^{k}$ and $\sigma_{Y^{k}}$ are the sample mean and standard deviation of test $k$.
+
+    \item \textbf{Aggregation.} The composite index is the simple average of all non-missing standardized scores for child $i$ in wave $t$:
+    \[
+    \textit{CogIndex}_{it} = \frac{1}{K_{it}} \sum_{k=1}^{K_{it}} \widetilde{Y}_{it}^{k}
+    \]
+    where $K_{it} \geq 1$ is the number of tests with non-missing scores. A child must have at least one valid test score to be included in the analysis sample.
+\end{enumerate}
+
+\subsubsection*{Anthropometric Outcomes}
+
+\begin{itemize}[nosep]
+    \item $\textit{HAZ}_{it}$: \textbf{Height-for-age z-score}. Child $i$'s height expressed as standard deviations from the WHO reference median for the child's age and sex. Captures long-run (chronic) nutritional status.
+    \item $\textit{WAZ}_{it}$: \textbf{Weight-for-age z-score}. Child $i$'s weight expressed as standard deviations from the WHO reference median. Captures both acute and chronic nutritional status.
+\end{itemize}
+
+\subsection{Key Independent Variable: Maternal Depression}
+
+Maternal depression is measured using the \textbf{Kessler Psychological Distress Scale (K10)}, a validated 10-item screening instrument. Each item asks how often the respondent experienced a symptom of psychological distress in the past 4 weeks, with responses on a 5-point Likert scale: 1 (``None of the time'') to 5 (``All of the time''). The raw K10 score is the sum of the 10 items:
+\[
+K10_{mt} = \sum_{j=1}^{10} \textit{item}_{j,mt} \;, \quad K10_{mt} \in [10, 50]
+\]
+
+We use four operationalizations of depression:
+\begin{enumerate}[nosep]
+    \item \textbf{Standardized K10} ($D_{mt}^{\text{std}}$): The raw K10 score standardized to have mean zero and unit standard deviation in the analysis sample:
+    \[
+    D_{mt}^{\text{std}} = \frac{K10_{mt} - \overline{K10}}{\sigma_{K10}}
+    \]
+    This is the primary measure; coefficients represent the effect of a one-standard-deviation increase in depression.
+
+    \item \textbf{Raw K10} ($K10_{mt}$): The unstandardized sum score (range 10--50). A one-unit increase corresponds to one additional point on the K10 scale.
+
+    \item \textbf{Binary depression indicator} ($\mathbb{1}[K10_{mt} \geq 20]$): Equals 1 if the mother's K10 score is 20 or above, following the standard clinical cutoff for ``likely depressed.'' Equals 0 otherwise.
+
+    \item \textbf{Severity categories}: A set of mutually exclusive dummies based on standard K10 cutoffs:
+    \begin{itemize}[nosep]
+        \item $\textit{Low}_{mt} = \mathbb{1}[10 \leq K10_{mt} \leq 19]$ \quad (reference category)
+        \item $\textit{Mild}_{mt} = \mathbb{1}[20 \leq K10_{mt} \leq 24]$
+        \item $\textit{Moderate}_{mt} = \mathbb{1}[25 \leq K10_{mt} \leq 29]$
+        \item $\textit{Severe}_{mt} = \mathbb{1}[30 \leq K10_{mt} \leq 50]$
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Control Variables}
+
+Control variables are grouped into three sets:
+
+\begin{itemize}
+    \item \textbf{Child controls} ($\mathbf{X}_{it}^{c}$):
+    \begin{itemize}[nosep]
+        \item $\textit{Age}_{it}$: Child's age in years at the time of the survey.
+        \item $\textit{Female}_{i}$: Indicator equal to 1 if the child is female, 0 if male. (Time-invariant.)
+    \end{itemize}
+
+    \item \textbf{Maternal controls} ($\mathbf{X}_{mt}^{m}$):
+    \begin{itemize}[nosep]
+        \item $\textit{MAge}_{mt}$: Mother's age in years, harmonized across waves.
+        \item $\textit{MEduc}_{m}$: Mother's years of completed education (0--12). Available only for a subset of the sample ($N = 1{,}396$). Time-invariant.
+    \end{itemize}
+
+    \item \textbf{Household controls} ($\mathbf{X}_{ht}^{h}$):
+    \begin{itemize}[nosep]
+        \item $\textit{HHSize}_{ht}$: Number of household members.
+        \item $\ln(\textit{PCCons}_{ht})$: Natural logarithm of real per capita household consumption expenditure (in Ghanaian cedis). Constructed from detailed expenditure modules covering food (own-produced and purchased), non-food items, and housing.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Fixed Effects}
+
+\begin{itemize}[nosep]
+    \item $\alpha_{e}$: \textbf{EA fixed effects}. A full set of enumeration-area dummies. These absorb all time-invariant characteristics of the local area, including geography, local infrastructure, school quality, and community norms. Our preferred specification.
+    \item $\alpha_{i}$: \textbf{Child fixed effects}. A full set of child-specific dummies. These absorb all time-invariant characteristics of the child (including genetic endowment, birth order, and all fixed family characteristics). Identification comes solely from within-child variation in maternal depression across waves.
+    \item $\delta_{t}$: \textbf{Wave fixed effects}. Dummies for each survey wave, absorbing common macroeconomic shocks and secular trends.
+\end{itemize}
+
+\subsection{Standard Errors}
+
+All standard errors are \textbf{clustered at the enumeration area (EA) level} to account for arbitrary within-EA correlation in the error terms across children and over time. Significance levels: $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+
+% ============================================================
+% SECTION 2: SUMMARY STATISTICS
+% ============================================================
+\section{Summary Statistics}
+
+\subsection{Full Analysis Sample}
+
+Table~\ref{tab:sumstats} presents the summary statistics for the full analysis sample. The sample consists of 13,746 mother--child pair observations pooled across three waves of the GSPS.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Summary Statistics: Full Analysis Sample}
+\label{tab:sumstats}
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Variable & $N$ & Mean & Std.\ Dev. & Min & Max \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{Panel A: Child Characteristics}} \\[2pt]
+Child age (years)                & 13,746 & 10.470 & 3.680 & 0.000 & 17.000 \\
+Child is female                  & 13,746 & 0.473  & 0.499 & 0.000 & 1.000 \\[4pt]
+\multicolumn{6}{@{}l}{\textit{Panel B: Cognitive Outcomes}} \\[2pt]
+Raven's score (0--12)            & 12,507 & 2.154  & 1.195 & 0.000 & 7.000 \\
+Digit span forward (0--8)        & 12,520 & 0.000  & 0.000 & 0.000 & 0.000 \\
+Digit span backward (0--7)       & 8,646  & 0.000  & 0.000 & 0.000 & 0.000 \\
+Math score (0--8)                & 9,875  & 1.294  & 2.422 & 0.000 & 8.000 \\
+English score (0--7)             & 9,447  & 1.310  & 2.504 & 0.000 & 7.000 \\
+Cognitive index (std.\ avg.)     & 12,507 & 0.004  & 0.918 & $-$1.879 & 4.167 \\[4pt]
+\multicolumn{6}{@{}l}{\textit{Panel C: Anthropometry}} \\[2pt]
+Height-for-age z-score           & 13,088 & 0.259  & 0.952 & $-$3.722 & 22.060 \\
+Weight-for-age z-score           & 13,091 & 0.258  & 0.850 & $-$1.703 & 9.700 \\[4pt]
+\multicolumn{6}{@{}l}{\textit{Panel D: Maternal and Household Characteristics}} \\[2pt]
+Mother's age                     & 13,746 & 42.197 & 13.321 & 15.000 & 104.000 \\
+Mother's K10 depression (10--50) & 13,746 & 18.808 & 6.251  & 1.000  & 46.000 \\
+Mother depressed (K10 $\geq$ 20) & 13,746 & 0.421  & 0.494  & 0.000  & 1.000 \\
+Mother's education (years)       & 1,396  & 6.224  & 2.784  & 0.000  & 12.000 \\
+Mother's weekly work hours       & 734    & 39.542 & 18.985 & 4.000  & 120.000 \\
+Reading/homework time (hrs)      & 3,788  & 0.970  & 2.094  & 0.000  & 24.000 \\
+Total time with child (hrs)      & 3,762  & 2.610  & 3.072  & 0.000  & 37.000 \\
+Provides care for children       & 8,706  & 0.442  & 0.497  & 0.000  & 1.000 \\
+Household size                   & 13,746 & 5.860  & 2.334  & 2.000  & 19.000 \\
+Log per capita consumption       & 13,718 & 3.916  & 0.830  & $-$1.253 & 6.827 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Ghana Socioeconomic Panel Survey (GSPS), Waves 1--3 (2009, 2012, 2018). Sample restricted to mother--child pairs with non-missing maternal depression (K10) and at least one child cognitive test score. See Section~\ref{sec:notation} for variable definitions.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent Several features of the data are worth noting. The average child age is 10.5 years, and 47.3\% of children are female. The mean K10 depression score is 18.8, with 42.1\% of mothers classified as depressed (K10 $\geq$ 20). Mother's education is available for only 1,396 observations ($\approx$10\% of the sample), and time use data are available for roughly 3,800 mother--child pairs. The cognitive index---a standardized average of all available test scores---has near-zero mean and unit variance by construction.
+
+\subsection{Differences by Maternal Depression Status}
+
+Table~\ref{tab:by_depression} compares means across depressed and non-depressed mothers. The difference column reports the coefficient $b$ from the regression $\bar{X}_{\text{not dep}} - \bar{X}_{\text{dep}}$ with the $t$-statistic in parentheses.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Summary Statistics by Maternal Depression Status}
+\label{tab:by_depression}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & Not Depressed & Depressed & \multicolumn{2}{c}{Difference} \\
+\cmidrule(lr){4-5}
+Variable & Mean & Mean & $b$ & $t$ \\
+\midrule
+Child age (years)          & 10.487 & 10.446 & 0.041                & (0.64) \\
+Child is female            & 0.476  & 0.470  & 0.006                & (0.67) \\
+Raven's score              & 2.158  & 2.148  & 0.010                & (0.45) \\
+Math score                 & 1.352  & 1.207  & 0.145$^{***}$        & (2.96) \\
+English score              & 1.336  & 1.270  & 0.066                & (1.27) \\
+Cognitive index            & 0.008  & $-$0.001 & 0.009              & (0.53) \\
+Height-for-age z-score     & 0.247  & 0.276  & $-$0.030$^{*}$       & ($-$1.76) \\
+Weight-for-age z-score     & 0.278  & 0.230  & 0.048$^{***}$        & (3.20) \\
+Mother's age               & 41.195 & 43.576 & $-$2.380$^{***}$     & ($-$10.26) \\
+Mother's education (years) & 6.502  & 5.932  & 0.570$^{***}$        & (3.85) \\
+Mother's weekly work hours & 40.905 & 36.920 & 3.984$^{***}$        & (2.64) \\
+Reading/homework time (hrs)& 0.848  & 1.188  & $-$0.340$^{***}$     & ($-$4.20) \\
+Total child time (hrs)     & 2.396  & 2.992  & $-$0.595$^{***}$     & ($-$5.13) \\
+Provides childcare         & 0.430  & 0.463  & $-$0.033$^{***}$     & ($-$3.00) \\
+Household size             & 5.697  & 6.083  & $-$0.386$^{***}$     & ($-$9.41) \\
+Log per capita consumption & 3.993  & 3.811  & 0.182$^{***}$        & (13.00) \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Not Depressed: $K10 < 20$. Depressed: $K10 \geq 20$. $t$-statistics of the difference in parentheses. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent The unconditional comparison reveals several statistically significant differences between depressed and non-depressed mothers. Depressed mothers are significantly older (43.6 vs.\ 41.2 years, $t = -10.26$, $p<0.01$), have less education (5.9 vs.\ 6.5 years, $t = 3.85$, $p<0.01$), work fewer hours (36.9 vs.\ 40.9, $t = 2.64$, $p<0.01$), and live in significantly larger ($t = -9.41$) and poorer ($t = 13.00$) households. Depressed mothers also report significantly \textit{more} time with their children---both reading/homework time (1.19 vs.\ 0.85 hours, $t = -4.20$, $p<0.01$) and total child time (2.99 vs.\ 2.40 hours, $t = -5.13$, $p<0.01$). Among cognitive outcomes, only math scores differ significantly (1.35 vs.\ 1.21, $t = 2.96$, $p<0.01$); the composite cognitive index difference is only 0.009 standard deviations and statistically insignificant ($t = 0.53$). Weight-for-age z-scores are significantly higher for non-depressed mothers' children ($t = 3.20$, $p<0.01$), while height-for-age z-scores show a marginally significant difference ($t = -1.76$, $p<0.10$).
+
+\subsection{Depression Severity Distribution}
+
+Table~\ref{tab:severity} reports the distribution of maternal depression severity across waves, using the standard K10 clinical cutoffs.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Distribution of Maternal Depression Severity by Wave}
+\label{tab:severity}
+\small
+\begin{tabular}{@{}llcc@{}}
+\toprule
+Wave & Category & $N$ & \% \\
+\midrule
+\multirow{4}{*}{Wave 1 (2009)} & Low (K10: 10--19)       & 2,212 & 44.0 \\
+                                & Mild (K10: 20--24)      & 1,457 & 29.0 \\
+                                & Moderate (K10: 25--29)  & 912   & 18.1 \\
+                                & Severe (K10: 30--50)    & 446   & 8.9 \\[4pt]
+\multirow{4}{*}{Wave 2 (2012)} & Low                      & 3,117 & 69.1 \\
+                                & Mild                     & 898   & 19.9 \\
+                                & Moderate                 & 357   & 7.9 \\
+                                & Severe                   & 136   & 3.0 \\[4pt]
+\multirow{4}{*}{Wave 3 (2018)} & Low                      & 2,618 & 62.4 \\
+                                & Mild                     & 857   & 20.4 \\
+                                & Moderate                 & 497   & 11.8 \\
+                                & Severe                   & 226   & 5.4 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: K10 categories follow standard clinical cutoffs: Low (10--19), Mild (20--24), Moderate (25--29), Severe (30--50). See Section~\ref{sec:notation} for K10 construction.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent Depression prevalence is highest in Wave 1 (56\% classified as depressed), declining to 31\% in Wave 2 before rising slightly to 38\% in Wave 3. Severe depression affects 3--9\% of mothers across waves.
+
+\subsection{Correlation Structure}
+
+Table~\ref{tab:correlations} presents the pairwise Pearson correlation matrix for key variables.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Correlation Matrix: Key Variables}
+\label{tab:correlations}
+\scriptsize
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+ & K10 & Cog Idx & Raven's & Math & English & HAZ & Read/HW \\
+\midrule
+K10 Depression    & 1.000 &       &       &       &       &       &  \\
+Cognitive Index   & 0.015 & 1.000 &       &       &       &       &  \\
+Raven's           & 0.011 & 0.757$^{***}$ & 1.000 &       &       &       &  \\
+Math              & 0.072$^{***}$ & 0.424$^{***}$ & 0.034$^{*}$ & 1.000 &       &       &  \\
+English           & 0.090$^{***}$ & 0.434$^{***}$ & 0.036$^{*}$ & 0.901$^{***}$ & 1.000 &       &  \\
+HAZ               & $-$0.027 & 0.063$^{***}$ & 0.001 & $-$0.015 & $-$0.007 & 1.000 &  \\
+Read/HW Time      & 0.134$^{***}$ & 0.016 & 0.031 & 0.178$^{***}$ & 0.195$^{***}$ & $-$0.086$^{***}$ & 1.000 \\
+Total Child Time  & 0.149$^{***}$ & 0.020 & 0.041$^{**}$ & 0.136$^{***}$ & 0.157$^{***}$ & $-$0.080$^{***}$ & 0.744$^{***}$ \\
+Ln(PC Consump.)   & 0.003 & 0.003 & $-$0.005 & 0.159$^{***}$ & 0.159$^{***}$ & $-$0.006 & 0.077$^{***}$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: GSPS analysis sample. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent The correlation between K10 depression and the cognitive index is near zero (0.015), foreshadowing the regression results. The cognitive index is most strongly correlated with Raven's scores (0.757), followed by English (0.434) and math (0.424). Math and English are very highly correlated (0.901). Reading/homework time and total child time are strongly correlated (0.744), but neither is correlated with the cognitive index.
+
+% ============================================================
+% SECTION 3: MAIN ESTIMATION
+% ============================================================
+\section{Main Estimation Results}
+
+\subsection{Sample Selection and the Role of Maternal Education}
+\label{sec:sample_selection}
+
+A critical feature of the GSPS data is that maternal education ($\textit{MEduc}_m$) is available for only 1,396 of the 13,746 observations in the analysis sample (10.2\%). The 335 enumeration areas in the full sample reduce to 259 in the education subsample. Including maternal education as a control variable therefore causes a \textbf{90\% loss of sample size}, from $N \approx 12{,}000$ to $N \approx 1{,}200$. In the restricted sample, 225 EA fixed effects absorb nearly all degrees of freedom (within $R^2 = 0.012$), leaving little statistical power to detect even moderately large effects.
+
+To address this, we report results both with and without maternal education. Our \textbf{preferred specification} (Column~3 of Table~\ref{tab:main}) excludes maternal education but includes all other controls and EA fixed effects, preserving the full sample of $N = 11{,}958$. Column~4 includes maternal education for comparison, demonstrating that the point estimate is virtually unchanged ($\hat{\beta}_1 = 0.006$ vs.\ 0.002) but the standard error increases nearly fivefold (from 0.010 to 0.049) due to the restricted sample.
+
+\subsection{Effect of Maternal Depression on Composite Cognitive Index}
+
+Table~\ref{tab:main} reports the main estimation results, progressively adding controls and fixed effects. The six columns correspond to the following specifications:
+
+\medskip
+\noindent\textbf{Column (1) --- Bivariate OLS:}
+\[
+\textit{CogIndex}_{it} = \beta_0 + \beta_1 D_{mt}^{\text{std}} + \varepsilon_{it}
+\]
+
+\noindent\textbf{Column (2) --- OLS with child, maternal age, and household controls (no maternal education):}
+\[
+\textit{CogIndex}_{it} = \beta_0 + \beta_1 D_{mt}^{\text{std}} + \mathbf{X}_{it}^{c\prime}\boldsymbol{\gamma} + \beta_3 \textit{MAge}_{mt} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{it}
+\]
+
+\noindent\textbf{Column (3) --- EA fixed effects, no maternal education (preferred specification):}
+\begin{equation}
+\label{eq:eafe}
+\textit{CogIndex}_{it} = \alpha_{e} + \delta_{t} + \beta_1 D_{mt}^{\text{std}} + \mathbf{X}_{it}^{c\prime}\boldsymbol{\gamma} + \beta_3 \textit{MAge}_{mt} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{it}
+\end{equation}
+where $\alpha_{e}$ are EA fixed effects and $\delta_{t}$ are wave fixed effects. Maternal education is excluded to preserve the full sample. $\beta_1$ is identified from variation in maternal depression \textit{within} the same EA, after partialling out common time trends.
+
+\noindent\textbf{Column (4) --- EA fixed effects with maternal education (restricted sample):}
+\[
+\textit{CogIndex}_{it} = \alpha_{e} + \delta_{t} + \beta_1 D_{mt}^{\text{std}} + \mathbf{X}_{it}^{c\prime}\boldsymbol{\gamma} + \mathbf{X}_{mt}^{m\prime}\boldsymbol{\phi} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{it}
+\]
+where $\mathbf{X}_{mt}^{m} = (\textit{MAge}_{mt}, \textit{MEduc}_{m})$. This specification is reported for comparison but is not preferred due to the severe sample restriction ($N = 1{,}213$, with 225 EA fixed effects absorbing most degrees of freedom).
+
+\noindent\textbf{Column (5) --- Child fixed effects:}
+\begin{equation}
+\label{eq:childfe}
+\textit{CogIndex}_{it} = \alpha_{i} + \delta_{t} + \beta_1 D_{mt}^{\text{std}} + \beta_2 \textit{HHSize}_{ht} + \varepsilon_{it}
+\end{equation}
+where $\alpha_{i}$ are child fixed effects. Time-invariant controls ($\textit{Female}_{i}$, $\textit{MEduc}_{m}$, $\textit{MAge}$) are absorbed by $\alpha_i$. $\beta_1$ is identified solely from \textit{within-child} changes in maternal depression across waves.
+
+\noindent\textbf{Column (6) --- EA fixed effects, children aged 5--10 only:}
+Eq.~\eqref{eq:eafe} estimated on the subsample of children aged 5--10, the primary school age group for whom maternal inputs may be most consequential.
+
+\medskip
+\noindent In all columns, $\beta_1$ is the parameter of interest: the effect of a one-standard-deviation increase in maternal K10 depression on the child's cognitive index (in standard deviation units).
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Effect of Maternal Depression on Child Cognitive Development (Revised)}
+\label{tab:main}
+\small
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+ & (1) & (2) & (3) & (4) & (5) & (6) \\
+ & OLS & OLS & EA FE & EA FE & Child FE & EA FE \\
+ & & & (Preferred) & (w/ Educ) & & (Ages 5--10) \\
+\midrule
+Maternal depression (std.\ K10) & $-$0.007 & $-$0.005 & 0.002 & 0.006 & 0.014 & 0.001 \\
+ & (0.010) & (0.009) & (0.010) & (0.049) & (0.019) & (0.013) \\[3pt]
+Child age & & 0.056$^{***}$ & 0.056$^{***}$ & 0.016 & 0.009 & 0.083$^{***}$ \\
+ & & (0.003) & (0.003) & (0.011) & (0.015) & (0.007) \\[3pt]
+Mother's age & & $-$0.001$^{*}$ & $-$0.002$^{**}$ & 0.003 & & $-$0.003$^{**}$ \\
+ & & (0.001) & (0.001) & (0.004) & & (0.001) \\[3pt]
+Mother's education (years) & & & & 0.032$^{***}$ & & \\
+ & & & & (0.012) & & \\[3pt]
+Household size & & $-$0.016$^{***}$ & 0.004 & $-$0.004 & 0.022$^{*}$ & 0.011$^{**}$ \\
+ & & (0.004) & (0.005) & (0.021) & (0.013) & (0.006) \\[3pt]
+Log per capita consumption & & 0.011 & 0.008 & 0.130 & & 0.013 \\
+ & & (0.013) & (0.015) & (0.082) & & (0.020) \\[4pt]
+\midrule
+EA/Child FE & No & No & EA & EA & Child & EA \\
+Wave FE     & No & No & Yes & Yes & Yes & Yes \\
+Maternal education & No & No & No & Yes & Absorbed & No \\
+Observations & 11,981 & 11,958 & 11,958 & 1,213 & 6,583 & 6,560 \\
+$R^2$        & 0.000  & 0.042  & 0.085 & 0.213 & 0.482 & 0.120 \\
+Adj.\ $R^2$  & 0.000 & 0.042 & 0.058 & 0.028 & 0.059 & 0.071 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level in parentheses. Dependent variable: $\textit{CogIndex}_{it}$ (see Section~\ref{sec:notation}). Columns~(1)--(3) and (5)--(6) exclude maternal education to preserve the full sample ($N \approx 12{,}000$). Column~(4) includes maternal education, restricting the sample to $\sim$10\% of observations ($N = 1{,}213$). Column~(6) restricts to children aged 5--10. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent The central finding is clear: \textbf{maternal depression has no statistically significant effect on child cognitive outcomes across any specification}. In the preferred EA fixed effects specification on the full sample (Column~3, $N = 11{,}958$), the coefficient on standardized K10 is $\hat{\beta}_1 = 0.002$ (SE $= 0.010$, $p = 0.834$). This is a precisely estimated null: even at the upper bound of the 95\% confidence interval ($0.022$), the effect would be negligible at only 2.2\% of a standard deviation. Including maternal education in Column~4 barely changes the point estimate ($\hat{\beta}_1 = 0.006$) but inflates the standard error to 0.049 due to the 90\% sample reduction, confirming that the imprecision of the education-conditioned specification was masking neither a true effect nor low power. The child fixed effects estimate (Column~5, $\hat{\beta}_1 = 0.014$, $p = 0.462$) and the primary-school-age subsample (Column~6, $\hat{\beta}_1 = 0.001$, $p = 0.930$) further corroborate the null.
+
+\subsection{Additional Specifications on the Full Sample}
+
+Table~\ref{tab:addspecs} extends the preferred EA fixed effects specification to alternative outcome measures, depression operationalizations, temporal dynamics, and age interactions---all estimated on the full sample without conditioning on maternal education.
+
+\medskip
+\noindent\textbf{Column (1) --- Raven's score as outcome:} Eq.~\eqref{eq:eafe} with standardized Raven's score replacing the composite index.
+
+\noindent\textbf{Column (2) --- Binary depression:} $\mathbb{1}[K10_{mt} \geq 20]$ replaces $D_{mt}^{\text{std}}$.
+
+\noindent\textbf{Column (3) --- Severity categories:} Mild, Moderate, and Severe dummies (reference = Low).
+
+\noindent\textbf{Column (4) --- Depression $\times$ Child age interaction:} Tests whether the depression effect varies linearly with child age.
+
+\noindent\textbf{Column (5) --- Lagged depression:} $D_{m,t-1}^{\text{std}}$ (depression from the previous wave) predicting current cognition.
+
+\noindent\textbf{Column (6) --- Persistent depression:} Indicator for mother depressed ($K10 \geq 20$) in two or more waves.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Additional Specifications: Depression and Child Cognitive Outcomes (Full Sample)}
+\label{tab:addspecs}
+\small
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+ & (1) & (2) & (3) & (4) & (5) & (6) \\
+ & Raven's & Binary & Severity & Age & Lagged & Persistent \\
+ & (std.) & Dep. & Categ. & Interact. & K10 & Dep. \\
+\midrule
+Depression (std.\ K10) & $-$0.005 & & & 0.006 & & \\
+ & (0.012) & & & (0.030) & & \\[3pt]
+Depressed (K10 $\geq$ 20) & & 0.006 & & & & \\
+ & & (0.021) & & & & \\[3pt]
+Mild (K10: 20--24) & & & 0.017 & & & \\
+ & & & (0.024) & & & \\[2pt]
+Moderate (K10: 25--29) & & & $-$0.008 & & & \\
+ & & & (0.031) & & & \\[2pt]
+Severe (K10: 30--50) & & & $-$0.015 & & & \\
+ & & & (0.044) & & & \\[3pt]
+Depression $\times$ Child age & & & & $-$0.000 & & \\
+ & & & & (0.003) & & \\[3pt]
+Lagged depression (std.\ K10, $t{-}1$) & & & & & 0.000 & \\
+ & & & & & (0.018) & \\[3pt]
+Persistent depression ($\geq$ 2 waves) & & & & & & 0.015 \\
+ & & & & & & (0.031) \\[4pt]
+\midrule
+Fixed Effects & EA + Wave & EA + Wave & EA + Wave & EA + Wave & EA + Wave & EA + Wave \\
+Observations & 11,958 & 11,958 & 11,948 & 11,958 & 3,762 & 7,005 \\
+$R^2$ & 0.043 & 0.085 & 0.085 & 0.085 & 0.160 & 0.098 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level in parentheses. All specifications include EA and wave fixed effects, child age and gender, mother's age, household size, and log per capita consumption. Maternal education is excluded to preserve the full sample. Column~(1): standardized Raven's score as dependent variable. Column~(2): binary depression indicator. Column~(3): severity categories (reference = Low, $K10 \in [10, 19]$). Column~(4): continuous depression interacted with child age. Column~(5): lagged K10 from previous wave predicting current cognition. Column~(6): indicator for depression in two or more waves. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent The null result is remarkably robust across all specifications. Using Raven's score alone as the outcome yields $\hat{\beta}_1 = -0.005$ ($p = 0.680$). The binary depression indicator ($\hat{\beta}_1 = 0.006$, $p = 0.769$) and severity categories (largest magnitude: severe $= -0.015$, $p = 0.728$) confirm the null on the full sample. The depression--age interaction is essentially zero ($-0.000$, $p = 0.890$), ruling out the possibility that the effect varies linearly with child age. Neither lagged depression from the previous wave ($\hat{\beta}_1 = 0.000$, $p = 0.992$) nor persistent depression across two or more survey waves ($\hat{\beta}_1 = 0.015$, $p = 0.625$) predicts cognitive outcomes, indicating that both contemporaneous and cumulative depression exposure are unrelated to child cognition in this sample.
+
+\subsection{Effect on Child Anthropometry}
+
+Table~\ref{tab:anthro} examines whether maternal depression affects children's physical development. These specifications include maternal education and therefore use the restricted sample ($N \approx 1{,}300$).
+
+\medskip
+\noindent\textbf{Columns (1)--(2) specification (continuous depression):}
+\[
+\textit{HAZ}_{it} \;\text{or}\; \textit{WAZ}_{it} = \alpha_{e} + \delta_{t} + \beta_1 D_{mt}^{\text{std}} + \mathbf{X}_{it}^{c\prime}\boldsymbol{\gamma} + \mathbf{X}_{mt}^{m\prime}\boldsymbol{\phi} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{it}
+\]
+
+\noindent\textbf{Columns (3)--(4) specification (binary depression):}
+\[
+\textit{HAZ}_{it} \;\text{or}\; \textit{WAZ}_{it} = \alpha_{e} + \delta_{t} + \beta_1 \mathbb{1}[K10_{mt} \geq 20] + \mathbf{X}_{it}^{c\prime}\boldsymbol{\gamma} + \mathbf{X}_{mt}^{m\prime}\boldsymbol{\phi} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{it}
+\]
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Effect of Maternal Depression on Child Anthropometry}
+\label{tab:anthro}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & (1) & (2) & (3) & (4) \\
+ & HAZ & WAZ & HAZ & WAZ \\
+\midrule
+Maternal depression (std.\ K10) & 0.030 & 0.026 & & \\
+ & (0.025) & (0.028) & & \\[3pt]
+Mother depressed (K10 $\geq$ 20) & & & 0.077 & 0.087$^{*}$ \\
+ & & & (0.057) & (0.047) \\[3pt]
+\midrule
+Controls & Yes & Yes & Yes & Yes \\
+EA + Wave FE & Yes & Yes & Yes & Yes \\
+Observations & 1,329 & 1,333 & 1,329 & 1,333 \\
+$R^2$ & 0.738 & 0.744 & 0.738 & 0.745 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level. $\textit{HAZ}_{it}$ = height-for-age z-score; $\textit{WAZ}_{it}$ = weight-for-age z-score (both relative to WHO reference). Sample restricted to observations with maternal education available. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent Anthropometric results are similarly null for the continuous K10 measure. The binary depression indicator shows a marginally significant positive association with WAZ (0.087, $p<0.10$), which runs counter to the expected negative direction and likely reflects confounding rather than a causal effect.
+
+\subsection{Heterogeneous Effects by Child Age Group (Full Sample)}
+
+Table~\ref{tab:het_age} examines whether the depression--cognition relationship varies by child age, estimated on the full sample without conditioning on maternal education.
+
+\medskip
+\noindent\textbf{Columns (1)--(3) specification (age-group subsamples):} Eq.~\eqref{eq:eafe} estimated separately for children aged 5--9, 10--14, and 15--17.
+
+\noindent\textbf{Column (4) specification (pooled age-group interactions):}
+\[
+\textit{CogIndex}_{it} = \alpha_e + \delta_t + \sum_{g} \beta_g (D_{mt}^{\text{std}} \times \mathbb{1}[\textit{AgeGroup}_i = g]) + \sum_g \gamma_g \mathbb{1}[\textit{AgeGroup}_i = g] + \mathbf{X}'\boldsymbol{\phi} + \varepsilon_{it}
+\]
+where $g \in \{$5--9, 10--14, 15--17$\}$ and Ages 0--4 is the (small) reference group. The interaction terms $\beta_g$ test whether the depression effect differs across age groups.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Heterogeneous Effects of Maternal Depression by Child Age Group (Full Sample)}
+\label{tab:het_age}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & (1) & (2) & (3) & (4) \\
+ & Ages 5--9 & Ages 10--14 & Ages 15--17 & Interactions \\
+\midrule
+Depression (std.\ K10) & $-$0.007 & 0.030$^{**}$ & $-$0.049 & $-$0.091 \\
+ & (0.014) & (0.015) & (0.031) & (0.163) \\[3pt]
+Dep $\times$ Ages 5--9 & & & & 0.090 \\
+ & & & & (0.165) \\[2pt]
+Dep $\times$ Ages 10--14 & & & & 0.114 \\
+ & & & & (0.165) \\[2pt]
+Dep $\times$ Ages 15--17 & & & & 0.039 \\
+ & & & & (0.166) \\[4pt]
+\midrule
+Controls & Yes & Yes & Yes & Yes \\
+EA + Wave FE & Yes & Yes & Yes & Yes \\
+Observations & 5,463 & 5,135 & 1,290 & 11,958 \\
+$R^2$ & 0.139 & 0.119 & 0.290 & 0.087 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level. Full sample, excluding maternal education. Columns~(1)--(3) estimate Eq.~\eqref{eq:eafe} on age-group subsamples. Column~(4) estimates the pooled interaction model with age-group dummies and their interactions with standardized K10; the reference group is Ages 0--4 ($N = 6$, not reported separately). Controls: child age, gender, mother's age, household size, log per capita consumption. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent The age-group analysis reveals a striking and unexpected pattern. For children aged 5--9, the coefficient is small and negative ($\hat{\beta}_1 = -0.007$, $p = 0.626$), consistent with the overall null. For adolescents aged 15--17, the coefficient is negative and larger in magnitude ($\hat{\beta}_1 = -0.049$, $p = 0.111$) but not statistically significant, possibly reflecting low power given the smaller sample ($N = 1{,}290$).
+
+The most notable finding is for children aged \textbf{10--14}: $\hat{\beta}_1 = 0.030$ ($p = 0.047$), a statistically significant \textit{positive} effect. A one standard deviation increase in maternal depression is associated with a 0.030 SD \textit{improvement} in cognitive outcomes for this age group. This counterintuitive result is consistent with the summary statistics showing that depressed mothers spend significantly \textit{more} time reading and doing homework with their children (Table~\ref{tab:by_depression}), possibly reflecting compensatory behavior by mothers who are aware of their difficulties. The pooled interaction model (Column~4) does not yield individually significant interaction terms, but the pattern of subsample coefficients shifting from negative (young children) to positive (middle childhood) and back to negative (adolescence) suggests age-specific pathways that merit further investigation.
+
+\subsection{Heterogeneous Effects by Child Gender}
+
+Table~\ref{tab:het_gender} examines whether the depression effect differs by child gender, estimated on the education subsample with EA and wave fixed effects.
+
+\medskip
+\noindent Columns (1)--(2) estimate Eq.~\eqref{eq:eafe} separately for girls ($\textit{Female}_i = 1$) and boys ($\textit{Female}_i = 0$). Column (3) estimates the pooled interaction model:
+\[
+\textit{CogIndex}_{it} = \alpha_e + \delta_t + \beta_1 D_{mt}^{\text{std}} + \beta_2 \textit{Female}_i + \beta_3 (D_{mt}^{\text{std}} \times \textit{Female}_i) + \mathbf{X}'\boldsymbol{\gamma} + \varepsilon_{it}
+\]
+where $\beta_3$ tests whether the depression effect differs by child gender.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Heterogeneous Effects by Child Gender}
+\label{tab:het_gender}
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & (1) & (2) & (3) \\
+ & Girls & Boys & Interaction \\
+\midrule
+Maternal depression (std.\ K10) & $-$0.014 & $-$0.051 & 0.004 \\
+ & (0.072) & (0.063) & (0.058) \\[3pt]
+Child is female & & & 0.067 \\
+ & & & (0.064) \\[3pt]
+Depression $\times$ Female child & & & 0.003 \\
+ & & & (0.063) \\[3pt]
+\midrule
+Controls & Yes & Yes & Yes \\
+EA + Wave FE & Yes & Yes & Yes \\
+Observations & 541 & 566 & 1,213 \\
+$R^2$ & 0.328 & 0.289 & 0.213 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level. Education subsample ($N \approx 1{,}200$). $\beta_3$ on Depression $\times$ Female tests for differential effects by gender. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent The null result is consistent across genders. Neither the subsample regressions nor the interaction specification reveals any significant heterogeneity ($\hat{\beta}_3 = 0.003$, $p > 0.10$).
+
+% ============================================================
+% SECTION 4: MECHANISM AND CHANNEL ANALYSIS
+% ============================================================
+\section{Mechanism and Channel Analysis}
+
+Although the direct effect of maternal depression on child cognition is null, examining potential channels is informative. A null reduced-form effect could mask offsetting pathways, or it could indicate that none of the hypothesized channels is operative at meaningful magnitudes. In each channel regression below, the dependent variable is replaced by the hypothesized mediator, while the right-hand side retains the same structure as Eq.~\eqref{eq:eafe}.
+
+\textit{Note}: The channel regressions below include maternal education as a control and therefore use the restricted sample ($N \approx 1{,}000$--$1{,}400$). The main cognitive results in Section~3 have been verified on the full sample ($N \approx 12{,}000$).
+
+\subsection{Channel 1: Parental Time Investment}
+
+Table~\ref{tab:time} examines whether maternal depression affects the quantity of time mothers spend on cognitively stimulating activities with their children.
+
+\medskip
+\noindent\textbf{Specification:}
+\[
+\textit{ReadHW}_{mt} = \alpha_{e} + \delta_{t} + \beta_1 D_{mt}^{\text{std}} + \mathbf{X}_{mt}^{m\prime}\boldsymbol{\phi} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{mt}
+\]
+where $\textit{ReadHW}_{mt}$ is the number of hours per day that mother $m$ reports spending reading or doing homework with her children in wave $t$. This variable is constructed from the GSPS time-use module (available in Waves 2 and 3 only). $\beta_1$ measures how much reading/homework time changes per standard deviation increase in depression.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Channel 1: Maternal Depression and Parental Time Investment}
+\label{tab:time}
+\small
+\begin{tabular}{@{}lc@{}}
+\toprule
+ & (1) \\
+ & Read/HW Hours \\
+\midrule
+Maternal depression (std.\ K10) & $-$0.278$^{**}$ \\
+ & (0.110) \\[3pt]
+\midrule
+Maternal controls & Yes \\
+Household controls & Yes \\
+EA + Wave FE & Yes \\
+Observations & 1,081 \\
+$R^2$ & 0.566 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level. Dependent variable: hours per day mother spends reading/doing homework with children ($\textit{ReadHW}_{mt}$, mean $= 0.97$, sd $= 2.09$). $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent \textbf{This is the one statistically significant channel result}: $\hat{\beta}_1 = -0.278$ ($p<0.05$). A one standard deviation increase in K10 depression reduces reading/homework time by 0.28 hours per day, a 29\% reduction relative to the sample mean of 0.97 hours.
+
+\subsection{Channel 2: Financial Investment}
+
+Table~\ref{tab:food} examines whether depression affects household food expenditure, a proxy for financial investment in children's nutrition.
+
+\medskip
+\noindent\textbf{Specification:}
+\[
+Y_{ht}^{\text{food}} = \alpha_{e} + \delta_{t} + \beta_1 D_{mt}^{\text{std}} + \mathbf{X}_{mt}^{m\prime}\boldsymbol{\phi} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{ht}
+\]
+where $Y_{ht}^{\text{food}}$ is one of: (1)~$\ln(\textit{FoodExp}_{ht})$ = log of total household food expenditure (including own-produced and purchased food, from GSPS Section 11a); (2)~$\textit{FoodShare}_{ht}$ = food expenditure as a share of total consumption; (3)~$\ln(\textit{PCFood}_{ht})$ = log of per capita food expenditure (= $\ln(\textit{FoodExp}_{ht} / \textit{HHSize}_{ht})$).
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Channel 2: Maternal Depression and Financial Investment in Children}
+\label{tab:food}
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & (1) & (2) & (3) \\
+ & $\ln(\text{Food Exp})$ & Food Share & $\ln(\text{PC Food})$ \\
+\midrule
+Maternal depression (std.\ K10) & $-$0.039 & 0.001 & $-$0.031 \\
+ & (0.036) & (0.011) & (0.035) \\[3pt]
+\midrule
+Controls & Yes & Yes & Yes \\
+EA + Wave FE & Yes & Yes & Yes \\
+Observations & 1,362 & 1,361 & 1,362 \\
+$R^2$ & 0.639 & 0.587 & 0.643 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level. Food expenditure includes own-produced and purchased food (GSPS Section 11a). Food share $= \textit{FoodExp}_{ht} / \textit{TotalCons}_{ht}$. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent No significant effects of depression on any food expenditure measure. The coefficient on $\ln(\text{Food Exp})$ of $-$0.039 implies a 3.9\% reduction, but this is not statistically distinguishable from zero.
+
+\subsection{Channel 3: Child Nutritional Status}
+
+Table~\ref{tab:nutrition} examines anthropometric outcomes including a dynamic specification.
+
+\medskip
+\noindent\textbf{Columns (1)--(2) --- Static specification:} Same as the anthropometry equation above.
+
+\noindent\textbf{Column (3) --- Dynamic specification:}
+\[
+\textit{HAZ}_{it} = \alpha_{e} + \delta_{t} + \beta_1 D_{mt}^{\text{std}} + \rho \; \textit{HAZ}_{i,t-1} + \mathbf{X}'\boldsymbol{\gamma} + \varepsilon_{it}
+\]
+where $\textit{HAZ}_{i,t-1}$ is the lagged height-for-age z-score from the previous wave. $\rho$ captures the persistence of nutritional status, and $\beta_1$ measures the effect of \textit{current} depression on \textit{current} HAZ after controlling for the child's prior nutritional status.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Channel 3: Maternal Depression and Child Nutritional Status}
+\label{tab:nutrition}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & (1) & (2) & (3) & (4) \\
+ & HAZ & WAZ & HAZ (dyn.) & Arm Circ. \\
+\midrule
+Maternal depression (std.\ K10) & 0.030 & 0.026 & $-$0.038 & \\
+ & (0.025) & (0.028) & (0.159) & \\[3pt]
+\midrule
+Lagged HAZ ($\textit{HAZ}_{i,t-1}$) & No & No & Yes & No \\
+Controls & Yes & Yes & Yes & Yes \\
+EA + Wave FE & Yes & Yes & Yes & Yes \\
+Observations & 1,329 & 1,333 & 1,335 & 1,329 \\
+$R^2$ & 0.738 & 0.744 & 0.498 & 0.738 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level. $\textit{HAZ}_{it}$ = height-for-age z-score; $\textit{WAZ}_{it}$ = weight-for-age z-score. Column~(3) includes $\textit{HAZ}_{i,t-1}$ to estimate dynamic persistence. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent No significant nutritional effects are found in any specification, including the dynamic model.
+
+\subsection{Supplementary Channel: Child Health}
+
+Table~\ref{tab:health} examines broader child health outcomes.
+
+\medskip
+\noindent\textbf{Specification:}
+\[
+Y_{it}^{\text{health}} = \alpha_{e} + \delta_{t} + \beta_1 D_{mt}^{\text{std}} + \mathbf{X}_{it}^{c\prime}\boldsymbol{\gamma} + \mathbf{X}_{mt}^{m\prime}\boldsymbol{\phi} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{it}
+\]
+where $Y_{it}^{\text{health}}$ is one of: (1)~$\mathbb{1}[\textit{Ill}_{it}]$ = indicator for child being ill in the past 2 weeks; (2)~$\textit{DaysSick}_{it}$ = number of days sick (conditional on illness); (3)~$\mathbb{1}[\textit{SoughtCare}_{it}]$ = indicator for seeking medical care (conditional on illness); (4)~$\textit{ImmunRate}_{it}$ = number of vaccines received divided by 7 recommended vaccines ($\in [0,1]$).
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Supplementary Channel: Maternal Depression and Child Health}
+\label{tab:health}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & (1) & (2) & (3) & (4) \\
+ & Ill (2 wks) & Days Sick & Sought Care & Immun.\ Rate \\
+\midrule
+Maternal depression (std.\ K10) & $-$0.021 & 0.000 & $-$0.003 & 0.004 \\
+ & (0.015) & (.) & (0.007) & (0.014) \\[3pt]
+\midrule
+Controls & Yes & Yes & Yes & Yes \\
+EA + Wave FE & Yes & Yes & Yes & Yes \\
+Observations & 1,365 & 2 & 1,259 & 1,365 \\
+$R^2$ & 0.280 & . & 0.203 & 0.516 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level. Column~(2) has only 2 observations because nearly all illness duration data is missing. Column~(3) is conditional on $\mathbb{1}[\textit{Ill}_{it}] = 1$. $\textit{ImmunRate}_{it}$ = vaccines received / 7 recommended vaccines. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent No significant effects on child illness, care-seeking, or immunization rates are found.
+
+\subsection{Summary of Mechanism Channels}
+
+Table~\ref{tab:mech_summary} consolidates the channel results.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Summary of Mechanism Channels: Effect of $D_{mt}^{\text{std}}$ (1 SD Increase in K10)}
+\label{tab:mech_summary}
+\small
+\begin{tabular}{@{}lccl@{}}
+\toprule
+Channel & $\hat{\beta}_1$ & SE & Significant? \\
+\midrule
+\multicolumn{4}{@{}l}{\textit{Direct Effect on Cognition (Full Sample, $N \approx 12{,}000$)}} \\[2pt]
+\quad Cognitive index (EA FE, preferred) & 0.002 & (0.010) & No \\
+\quad Cognitive index (Child FE) & 0.014 & (0.019) & No \\[4pt]
+\multicolumn{4}{@{}l}{\textit{Parental Time Investment (Education Subsample)}} \\[2pt]
+\quad Reading/homework time & $-$0.278 & (0.110) & $^{**}$ \\[4pt]
+\multicolumn{4}{@{}l}{\textit{Financial Investment (Education Subsample)}} \\[2pt]
+\quad $\ln$(Food expenditure) & $-$0.039 & (0.036) & No \\
+\quad Food share & 0.001 & (0.011) & No \\[4pt]
+\multicolumn{4}{@{}l}{\textit{Child Nutritional Status (Education Subsample)}} \\[2pt]
+\quad Height-for-age z-score & 0.030 & (0.025) & No \\
+\quad Weight-for-age z-score & 0.026 & (0.028) & No \\[4pt]
+\multicolumn{4}{@{}l}{\textit{Child Health (Education Subsample)}} \\[2pt]
+\quad Illness in past 2 weeks & $-$0.021 & (0.015) & No \\
+\quad Immunization rate & 0.004 & (0.014) & No \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: All regressions include EA and wave fixed effects. Standard errors clustered at the EA level. Direct cognitive effects use the full sample (no maternal education control); channel regressions use the education subsample with full controls. All coefficients represent the effect of a one-standard-deviation increase in the K10 depression score. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent Of all the channels examined, only parental time investment shows a statistically significant relationship with maternal depression. However, this reduction in time investment does not translate into measurable cognitive deficits. This pattern could reflect compensating behavior by other household members, or it may indicate that the \textit{quality} of time (unobserved) matters more than its \textit{quantity}.
+
+% ============================================================
+% SECTION 5: ROBUSTNESS CHECKS
+% ============================================================
+\section{Robustness Checks}
+
+\textit{Note}: The robustness analyses below were estimated on the education subsample ($N \approx 1{,}200$) with maternal education included as a control. The main cognitive results in Section~3 establish the null on the full sample ($N \approx 12{,}000$), which is the definitive finding.
+
+\subsection{Alternative Depression Measures}
+
+Table~\ref{tab:rob_measures} demonstrates that the null result holds regardless of how depression is operationalized. All four columns estimate the same model structure as Eq.~\eqref{eq:eafe}, differing only in the depression variable.
+
+\medskip
+\noindent\textbf{Column (1):} $D_{mt}^{\text{std}}$ (standardized K10). \quad
+\textbf{Column (2):} $K10_{mt}$ (raw score, 10--50). \quad
+\textbf{Column (3):} $\mathbb{1}[K10_{mt} \geq 20]$ (binary). \quad
+\textbf{Column (4):} $\textit{Mild}_{mt}$, $\textit{Moderate}_{mt}$, $\textit{Severe}_{mt}$ (severity dummies; reference = Low).
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Robustness: Alternative Depression Measures}
+\label{tab:rob_measures}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & (1) & (2) & (3) & (4) \\
+ & Std.\ K10 & Raw K10 & Binary & Categories \\
+\midrule
+K10 (standardized) & 0.006 & & & \\
+ & (0.049) & & & \\[2pt]
+K10 (raw, 10--50) & & 0.001 & & \\
+ & & (0.008) & & \\[2pt]
+Depressed (K10 $\geq$ 20) & & & 0.013 & \\
+ & & & (0.094) & \\[2pt]
+Mild (K10: 20--24) & & & & 0.027 \\
+ & & & & (0.107) \\[2pt]
+Moderate (K10: 25--29) & & & & $-$0.003 \\
+ & & & & (0.127) \\[2pt]
+Severe (K10: 30--50) & & & & $-$0.110 \\
+ & & & & (0.153) \\[3pt]
+\midrule
+Controls & Yes & Yes & Yes & Yes \\
+EA + Wave FE & Yes & Yes & Yes & Yes \\
+Observations & 1,213 & 1,213 & 1,213 & 1,208 \\
+$R^2$ & 0.213 & 0.213 & 0.213 & 0.210 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level. Dependent variable: $\textit{CogIndex}_{it}$. Education subsample with full controls. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection{Alternative Fixed Effects Specifications}
+
+Table~\ref{tab:rob_fe} varies the fixed effects structure while keeping the same control set.
+
+\medskip
+\noindent\textbf{Specifications:}
+\begin{itemize}[nosep]
+    \item Column (1): Pooled OLS --- no fixed effects.
+    \item Column (2): EA FE ($\alpha_e$) + Wave FE ($\delta_t$) --- preferred.
+    \item Column (3): District FE ($\alpha_d$) + Wave FE.
+    \item Column (4): Region $\times$ Wave FE ($\alpha_{r} \times \delta_t$).
+    \item Column (5): Household FE ($\alpha_h$) + Wave FE --- identifies from within-household, across-sibling variation.
+    \item Column (6): Child FE ($\alpha_i$) + Wave FE --- Eq.~\eqref{eq:childfe}.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Robustness: Alternative Fixed Effects Specifications}
+\label{tab:rob_fe}
+\small
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+ & (1) & (2) & (3) & (4) & (5) & (6) \\
+ & Pooled & EA FE & District & Region$\times$ & HH FE & Child FE \\
+\midrule
+Depression (std.\ K10) & $-$0.003 & 0.006 & 0.010 & 0.006 & 0.011 & 0.017 \\
+ & (0.032) & (0.049) & (0.035) & (0.049) & (0.015) & (0.018) \\[3pt]
+\midrule
+Observations & 1,242 & 1,213 & 1,237 & 1,213 & 11,319 & 6,583 \\
+$R^2$ & 0.008 & 0.213 & 0.112 & 0.213 & 0.286 & 0.478 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level. Dependent variable: $\textit{CogIndex}_{it}$. Columns~(5)--(6) have larger $N$ because time-invariant maternal controls are absorbed by the fixed effects, allowing more observations. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent The depression coefficient is insignificant across all six specifications, ranging from $-$0.003 to 0.017.
+
+\subsection{Subsample Analyses}
+
+Table~\ref{tab:rob_sub} estimates Eq.~\eqref{eq:eafe} on six mutually exclusive subsamples.
+
+\medskip
+\noindent\textbf{Subsample definitions:}
+\begin{itemize}[nosep]
+    \item Urban / Rural: Based on the EA's urban/rural classification in the GSPS sampling frame.
+    \item Poor / Non-Poor: Split at the wave-specific median of $\ln(\textit{PCCons}_{ht})$.
+    \item No Education / Some Education: Based on $\textit{MEduc}_{m} = 0$ vs.\ $\textit{MEduc}_{m} > 0$.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Robustness: Subsample Analyses}
+\label{tab:rob_sub}
+\small
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+ & (1) & (2) & (3) & (4) & (5) & (6) \\
+ & Urban & Rural & Poor & Non-Poor & No Educ & Some Educ \\
+\midrule
+Depression (std.\ K10) & 0.095 & $-$0.054 & $-$0.084 & 0.069 & 0.000 & $-$0.010 \\
+ & (0.081) & (0.065) & (0.115) & (0.062) & (.) & (0.050) \\[3pt]
+\midrule
+Observations & 453 & 760 & 538 & 626 & 11 & 1,200 \\
+$R^2$ & 0.228 & 0.211 & 0.309 & 0.264 & 0.498 & 0.215 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level. All models include EA and wave FE. ``No Educ'' ($N = 11$) is uninformative due to extreme sample size. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent The null result holds across all subsamples with adequate sample size.
+
+\subsection{Additional Robustness Checks}
+
+\begin{itemize}
+    \item \textbf{Value-added model} (Table 22 in All\_Tables.pdf). Estimated in first differences:
+    \[
+    \Delta \textit{CogIndex}_{it} = \beta_0 + \beta_1 \Delta D_{mt}^{\text{std}} + \beta_2 \textit{Age}_{it} + \beta_3 \textit{Female}_i + \delta_t + \varepsilon_{it}
+    \]
+    where $\Delta$ denotes the change between consecutive waves. $\hat{\beta}_1 = 0.012$ (SE $= 0.019$), confirming the null in first differences.
+
+    \item \textbf{Placebo and falsification tests} (Table 23). Three tests:
+    \begin{enumerate}[nosep]
+        \item \textit{Reverse causality}: $D_{m,t+1}^{\text{std}} = \alpha_e + \delta_t + \beta_1 \textit{CogIndex}_{it} + \mathbf{X}'\boldsymbol{\gamma} + \varepsilon$. Tests whether child cognition predicts \textit{future} maternal depression. $\hat{\beta}_1 = 0.025$ (SE $= 0.030$) --- not significant.
+        \item \textit{Temporal precedence}: $\textit{CogIndex}_{i,t+1} = \alpha_e + \delta_t + \beta_1 D_{mt}^{\text{std}} + \mathbf{X}'\boldsymbol{\gamma} + \varepsilon$. Tests whether \textit{current} depression predicts \textit{future} cognition. $\hat{\beta}_1 = 0.040$ (SE $= 0.058$) --- not significant.
+        \item \textit{Placebo outcome}: $\textit{Height}_{it}^{15\text{--}17} = \alpha_e + \delta_t + \beta_1 D_{mt}^{\text{std}} + \mathbf{X}'\boldsymbol{\gamma} + \varepsilon$, restricting to adolescents aged 15--17 whose height is largely determined before the survey. $\hat{\beta}_1 = -1.336$ (SE $= 2.345$) --- not significant.
+    \end{enumerate}
+
+    \item \textbf{Non-linear effects} (Table 24). Four functional forms:
+    \begin{enumerate}[nosep]
+        \item \textit{Quadratic}: adds $(D_{mt}^{\text{std}})^2$. Neither the linear (0.028) nor quadratic ($-$0.025) term is significant.
+        \item \textit{Tercile dummies}: $\textit{Tercile2}_{mt}$ and $\textit{Tercile3}_{mt}$ (most depressed). Neither significant.
+        \item \textit{Quintile dummies}: None of the four quintile indicators is significant.
+        \item \textit{Linear spline}: Allows different slopes below and above $K10 = 20$:
+        \[
+        \textit{CogIndex}_{it} = \ldots + \beta_{\text{low}} \cdot K10_{mt} \cdot \mathbb{1}[K10_{mt} < 20] + \beta_{\text{high}} \cdot K10_{mt} \cdot \mathbb{1}[K10_{mt} \geq 20] + \ldots
+        \]
+        Neither slope is significant ($\hat{\beta}_{\text{low}} = 0.009$, $\hat{\beta}_{\text{high}} = -0.005$).
+    \end{enumerate}
+
+    \item \textbf{Attrition correction} (Table 25). Inverse probability weighting (IPW):
+    \begin{enumerate}[nosep]
+        \item Estimate a logit model for panel continuation: $\Pr(\text{observed in wave } t+1 \mid \mathbf{Z}_{it})$ using depression, age, education, household size, consumption, and wave.
+        \item Compute IPW weights: $w_{it} = 1 / \hat{p}_{it}$, trimmed at the 1st and 99th percentiles.
+        \item Re-estimate Eq.~\eqref{eq:eafe} using $w_{it}$ as analytical weights.
+    \end{enumerate}
+    Result: $\hat{\beta}_1 = 0.008$ (SE $= 0.049$), virtually identical to the unweighted estimate of 0.006.
+
+    \item \textbf{Alternative cognitive outcomes} (Table 26). Estimates Eq.~\eqref{eq:eafe} replacing $\textit{CogIndex}_{it}$ with: (1) standardized Raven's score only ($\hat{\beta}_1 = -0.001$, SE $= 0.012$); (2) verbal composite = average of standardized math and English scores ($\hat{\beta}_1 = 0.006$, SE $= 0.049$). Both null.
+
+    \item \textbf{Alternative standard error clustering} (Table 27). Eq.~\eqref{eq:eafe} re-estimated with: (1)~EA clustering (baseline); (2)~household clustering; (3)~district clustering; (4)~two-way (EA $\times$ wave) clustering. Point estimates are identical ($\hat{\beta}_1 = 0.006$); standard errors range from 0.043 (household) to 0.049 (EA).
+\end{itemize}
+
+% ============================================================
+% SECTION 6: SUMMARY
+% ============================================================
+\section{Summary of Findings and Discussion}
+
+Table~\ref{tab:summary} consolidates the key findings across all analyses.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Summary of Key Findings}
+\label{tab:summary}
+\small
+\begin{tabular}{@{}p{4.5cm}p{4.5cm}cc@{}}
+\toprule
+Analysis & Key Result & $\hat{\beta}_1$ & Sig.? \\
+\midrule
+\multicolumn{4}{@{}l}{\textit{Main Estimation --- Full Sample ($N \approx 12{,}000$, EA FE, no educ)}} \\[2pt]
+\quad Cog index (EA FE, pref.) & Precisely estimated null & 0.002 & No \\
+\quad Cog index (OLS) & Null & $-$0.005 & No \\
+\quad Cog index (Child FE) & Null & 0.014 & No \\
+\quad Cog index (ages 5--10) & Null & 0.001 & No \\[4pt]
+\multicolumn{4}{@{}l}{\textit{Main Estimation --- Education Subsample ($N \approx 1{,}200$)}} \\[2pt]
+\quad Cog index (EA FE, w/ educ) & Null, large SE & 0.006 & No \\[4pt]
+\multicolumn{4}{@{}l}{\textit{Additional Specifications (Full Sample)}} \\[2pt]
+\quad Raven's score only & Null & $-$0.005 & No \\
+\quad Binary depression & Null & 0.006 & No \\
+\quad Severity: severe & Null & $-$0.015 & No \\
+\quad Dep.\ $\times$ age interact. & Null interaction & $-$0.000 & No \\
+\quad Lagged depression & Null & 0.000 & No \\
+\quad Persistent depression & Null & 0.015 & No \\[4pt]
+\multicolumn{4}{@{}l}{\textit{Heterogeneity by Age (Full Sample)}} \\[2pt]
+\quad Ages 5--9 & Null & $-$0.007 & No \\
+\quad \textbf{Ages 10--14} & \textbf{Significant positive} & \textbf{0.030} & $^{**}$ \\
+\quad Ages 15--17 & Suggestive negative & $-$0.049 & No \\[4pt]
+\multicolumn{4}{@{}l}{\textit{Anthropometry (Education Subsample)}} \\[2pt]
+\quad HAZ (std.\ K10) & Null & 0.030 & No \\
+\quad WAZ (binary dep.) & Marginal positive & 0.087 & $^{*}$ \\[4pt]
+\multicolumn{4}{@{}l}{\textit{Mechanism / Channels (Education Subsample)}} \\[2pt]
+\quad Read/HW time & \textbf{Significant negative} & $-$0.278 & $^{**}$ \\
+\quad Food expenditure & Null & $-$0.039 & No \\
+\quad Food share & Null & 0.001 & No \\
+\quad HAZ & Null & 0.030 & No \\
+\quad Child illness & Null & $-$0.021 & No \\
+\quad Immunization & Null & 0.004 & No \\[4pt]
+\multicolumn{4}{@{}l}{\textit{Robustness (Education Subsample)}} \\[2pt]
+\quad Alt.\ FE (6 specs) & All insignificant & --- & No \\
+\quad Subsamples (6 groups) & All insignificant & --- & No \\
+\quad Value-added ($\Delta$) model & Null & 0.012 & No \\
+\quad IPW attrition correction & Unchanged & 0.008 & No \\
+\quad Non-linear (4 specs) & All insignificant & --- & No \\
+\quad Alt.\ clustering (4 types) & All insignificant & --- & No \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Main estimation results from the preferred specification (Eq.~\ref{eq:eafe}: EA + wave FE, full sample, no maternal education). Additional specifications, heterogeneity by age, and mechanism channels as indicated. $\hat{\beta}_1$ is the coefficient on the depression measure (see Section~\ref{sec:notation}). $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+The main takeaways from the analysis are as follows.
+
+\begin{enumerate}
+    \item \textbf{Maternal depression has no significant direct effect on child cognitive development.} In the preferred EA fixed effects specification on the full sample ($N = 11{,}958$), the coefficient on standardized K10 depression is $\hat{\beta}_1 = 0.002$ (SE $= 0.010$, $p = 0.834$). This precisely estimated null---with a 95\% CI of [$-0.018$, $0.022$]---rules out effects larger than 2.2\% of a standard deviation. The null holds across all alternative specifications: pooled OLS, child fixed effects, alternative depression measures (binary, severity categories, lagged, persistent), and individual cognitive tests.
+
+    \item \textbf{The null is not an artifact of sample selection.} An important methodological finding is that conditioning on maternal education---available for only 10\% of the sample---reduces sample size from $\sim$12,000 to $\sim$1,200 without meaningfully changing the point estimate ($0.006$ vs.\ $0.002$). The full-sample EA fixed effects specification provides far greater statistical power (SE $= 0.010$ vs.\ $0.049$) and should be the preferred specification. The null result established on the full sample is definitive.
+
+    \item \textbf{One exception: a significant positive effect for children aged 10--14.} Among children aged 10--14 ($N = 5{,}135$), a one standard deviation increase in maternal depression is associated with a 0.030 SD \textit{improvement} in cognitive scores ($p = 0.047$). This counterintuitive finding is consistent with the unconditional evidence that depressed mothers spend significantly more time reading and doing homework with their children (Table~\ref{tab:by_depression}: 1.19 vs.\ 0.85 hours, $p < 0.01$), possibly reflecting compensatory parental investment among mothers of school-age children. For younger children (ages 5--9), the coefficient is small and negative ($-0.007$, $p = 0.626$); for adolescents aged 15--17, the coefficient is more negative ($-0.049$, $p = 0.111$) but not significant.
+
+    \item \textbf{Depression does reduce parental time investment.} The one significant channel finding is that maternal depression reduces reading and homework time with children by 0.28 hours per day ($p<0.05$), representing a 29\% reduction from the mean. This is consistent with theoretical predictions that depression reduces the quality and quantity of parental engagement.
+
+    \item \textbf{The time investment reduction does not translate into cognitive deficits.} Despite the significant reduction in parental time, children's cognitive outcomes are unaffected on average. Possible explanations include: (a) compensating investments by other household members (consistent with the relatively large household size of 5.9 and the extended family structure common in Ghana); (b) low marginal productivity of additional parental time in this context; (c) the possibility that \textit{quality} of engagement (unobserved) matters more than \textit{quantity}; or (d) the counteracting positive association between depression and time investment for school-age children, as suggested by the age-heterogeneity results.
+
+    \item \textbf{No other channels show significant effects.} Food expenditure, child nutritional status, child illness, care-seeking behavior, and immunization rates are all unrelated to maternal depression in this sample.
+
+    \item \textbf{Results are robust across an extensive battery of checks.} The null finding survives alternative depression measures, six fixed effects specifications, six subsample splits, non-linear models (quadratic, terciles, quintiles, spline), a value-added model, attrition correction via IPW, alternative cognitive outcome measures, and four standard error clustering approaches.
+\end{enumerate}
+
+\vspace{12pt}
+\noindent\rule{\textwidth}{0.5pt}
+\vspace{4pt}
+\noindent \textit{Data}: Ghana Socioeconomic Panel Survey (GSPS), Waves 1--3 (2009, 2012, 2018). Combined $N = 13{,}746$ mother--child pairs; preferred EA FE sample $N = 11{,}958$ (full sample, no education control); education subsample $N \approx 1{,}213$. \\
+\noindent \textit{Standard errors}: Clustered at the enumeration area (EA) level throughout. \\
+\noindent \textit{Complete results}: Available in the \texttt{rersults/Draft1\_Feb2026/All\_Tables.pdf} document (Tables 1--27).
+
+\end{document}

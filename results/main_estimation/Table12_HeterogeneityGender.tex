@@ -1,0 +1,32 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Heterogeneous Effects of Maternal Depression by Child Gender}
+\begin{tabular}{l*{3}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}\\
+            &\multicolumn{1}{c}{Girls}&\multicolumn{1}{c}{Boys}&\multicolumn{1}{c}{Interaction}\\
+\midrule
+Maternal depression (std. K10)&      -0.014         &      -0.051         &       0.004         \\
+            &     (0.072)         &     (0.063)         &     (0.058)         \\
+\addlinespace
+Child is female&                     &                     &       0.067         \\
+            &                     &                     &     (0.064)         \\
+\addlinespace
+Depression $\times$ Female child&                     &                     &       0.003         \\
+            &                     &                     &     (0.063)         \\
+\addlinespace
+Controls    &         Yes         &         Yes         &         Yes         \\
+\addlinespace
+EA FE       &          No         &          No         &          No         \\
+\addlinespace
+Wave FE     &          No         &          No         &          No         \\
+\midrule
+Observations&         541         &         566         &       1,213         \\
+$R^2$       &       0.328         &       0.289         &       0.213         \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{4}{l}{\footnotesize Standard errors clustered at the EA level in parentheses.}\\
+\multicolumn{4}{l}{\footnotesize *** p$<$0.01, ** p$<$0.05, * p$<$0.1}\\
+\multicolumn{4}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

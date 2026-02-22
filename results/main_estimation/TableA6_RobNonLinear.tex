@@ -1,0 +1,57 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Robustness: Non-Linear Effects of Maternal Depression}
+\begin{tabular}{l*{4}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+            &\multicolumn{1}{c}{Quadratic}&\multicolumn{1}{c}{Terciles}&\multicolumn{1}{c}{Quintiles}&\multicolumn{1}{c}{Spline}\\
+\midrule
+Depression (std.)&       0.028         &                     &                     &                     \\
+            &     (0.059)         &                     &                     &                     \\
+\addlinespace
+Depression$^2$&      -0.025         &                     &                     &                     \\
+            &     (0.026)         &                     &                     &                     \\
+\addlinespace
+0.c\_female  &       0.000         &       0.000         &       0.000         &       0.000         \\
+            &         (.)         &         (.)         &         (.)         &         (.)         \\
+\addlinespace
+Tercile 2   &                     &       0.040         &                     &                     \\
+            &                     &     (0.108)         &                     &                     \\
+\addlinespace
+Tercile 3 (most depressed)&                     &       0.061         &                     &                     \\
+            &                     &     (0.127)         &                     &                     \\
+\addlinespace
+Quintile 2  &                     &                     &      -0.072         &                     \\
+            &                     &                     &     (0.145)         &                     \\
+\addlinespace
+Quintile 3  &                     &                     &      -0.018         &                     \\
+            &                     &                     &     (0.148)         &                     \\
+\addlinespace
+Quintile 4  &                     &                     &       0.070         &                     \\
+            &                     &                     &     (0.170)         &                     \\
+\addlinespace
+Quintile 5 (most depressed)&                     &                     &      -0.032         &                     \\
+            &                     &                     &     (0.163)         &                     \\
+\addlinespace
+K10 (below 20)&                     &                     &                     &       0.009         \\
+            &                     &                     &                     &     (0.018)         \\
+\addlinespace
+K10 (above 20)&                     &                     &                     &      -0.005         \\
+            &                     &                     &                     &     (0.011)         \\
+\addlinespace
+\_cons      &      -0.825\sym{**} &      -0.891\sym{**} &      -0.832\sym{**} &      -0.899\sym{**} \\
+            &     (0.387)         &     (0.397)         &     (0.415)         &     (0.407)         \\
+\addlinespace
+Controls    &         Yes         &         Yes         &         Yes         &         Yes         \\
+\midrule
+Observations&       1,213         &       1,213         &       1,213         &       1,213         \\
+$R^2$       &       0.214         &       0.213         &       0.214         &       0.213         \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize Standard errors clustered at the EA level in parentheses.}\\
+\multicolumn{5}{l}{\footnotesize Reference: Tercile 1 / Quintile 1 (least depressed).}\\
+\multicolumn{5}{l}{\footnotesize Spline model allows different slopes below and above K10 = 20.}\\
+\multicolumn{5}{l}{\footnotesize *** p$<$0.01, ** p$<$0.05, * p$<$0.1}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

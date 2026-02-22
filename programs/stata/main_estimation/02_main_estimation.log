@@ -1,0 +1,1439 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers
+> /OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment/progr
+> ams/stata/Draft1_Feb2026/02_main_estimation.log
+  log type:  text
+ opened on:  21 Feb 2026, 21:07:13
+
+. 
+. /* Load analysis dataset */
+. use "$programs/analysis_data.dta", clear
+
+. keep if analysis_sample == 1
+(9,191 observations deleted)
+
+. 
+. /* Install required packages */
+. cap ssc install estout, replace
+
+. cap ssc install reghdfe, replace
+
+. cap ssc install ftools, replace
+
+. cap ssc install ivreg2, replace
+
+. cap ssc install ranktest, replace
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     DEFINE CONTROL VARIABLE SETS
+> =============================================================================
+> =*/
+. 
+. /* Child-level controls */
+. global child_controls "c_age i.c_female"
+
+. 
+. /* Maternal controls */
+. global maternal_controls "m_age_harmonized m_mother_educ_years"
+
+. 
+. /* Household controls */
+. global hh_controls "hh_size ln_pc_consumption"
+
+. 
+. /* Full controls */
+. global full_controls "$child_controls $maternal_controls $hh_controls"
+
+. 
+. /* Fixed effects */
+. /* EA fixed effects for cross-sectional identification */
+. /* Household FE for within-household variation (siblings) */
+. /* Wave FE for time trends */
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 6: MAIN RESULTS — EFFECT OF MATERNAL DEPRESSION ON CHILD COGNITION
+>     Outcome: Composite Cognitive Index
+> =============================================================================
+> =*/
+. 
+. eststo clear
+
+. 
+. /* Column 1: Pooled OLS — No controls */
+. eststo m1: reg cog_index m_k10_std, ///
+>     cluster(ea_id)
+
+Linear regression                               Number of obs     =     11,981
+                                                F(1, 334)         =       0.57
+                                                Prob > F          =     0.4517
+                                                R-squared         =     0.0001
+                                                Root MSE          =     .92503
+
+                                (Std. err. adjusted for 335 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |  -.0072275   .0095916    -0.75   0.452    -.0260951      .01164
+       _cons |   .0088959   .0121629     0.73   0.465    -.0150297    .0328215
+------------------------------------------------------------------------------
+
+. estadd local ea_fe "No"
+
+added macro:
+              e(ea_fe) : "No"
+
+. estadd local wave_fe "No"
+
+added macro:
+            e(wave_fe) : "No"
+
+. 
+. /* Column 2: OLS + Child controls */
+. eststo m2: reg cog_index m_k10_std $child_controls, ///
+>     cluster(ea_id)
+
+Linear regression                               Number of obs     =     11,981
+                                                F(3, 334)         =     125.30
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0394
+                                                Root MSE          =     .90671
+
+                                (Std. err. adjusted for 335 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |  -.0096731   .0095196    -1.02   0.310     -.028399    .0090528
+       c_age |   .0552778   .0029155    18.96   0.000     .0495427    .0610129
+  1.c_female |   .0296589    .017021     1.74   0.082     -.003823    .0631407
+       _cons |   -.561977   .0323308   -17.38   0.000    -.6255748   -.4983793
+------------------------------------------------------------------------------
+
+. estadd local ea_fe "No"
+
+added macro:
+              e(ea_fe) : "No"
+
+. estadd local wave_fe "No"
+
+added macro:
+            e(wave_fe) : "No"
+
+. 
+. /* Column 3: OLS + Child + Maternal controls */
+. eststo m3: reg cog_index m_k10_std $child_controls $maternal_controls, ///
+>     cluster(ea_id)
+
+Linear regression                               Number of obs     =      1,243
+                                                F(5, 253)         =       1.21
+                                                Prob > F          =     0.3064
+                                                R-squared         =     0.0046
+                                                Root MSE          =     1.0086
+
+                                (Std. err. adjusted for 254 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |  -.0028937   .0322182    -0.09   0.929    -.0663437    .0605564
+       c_age |   .0181236   .0099425     1.82   0.070     -.001457    .0377042
+  1.c_female |  -.0011213   .0558687    -0.02   0.984    -.1111483    .1089056
+m_age_harm~d |   .0002649   .0029269     0.09   0.928    -.0054992     .006029
+m_mother_e~s |    .016345   .0113174     1.44   0.150    -.0059432    .0386333
+       _cons |  -.2007386   .1763005    -1.14   0.256    -.5479422     .146465
+------------------------------------------------------------------------------
+
+. estadd local ea_fe "No"
+
+added macro:
+              e(ea_fe) : "No"
+
+. estadd local wave_fe "No"
+
+added macro:
+            e(wave_fe) : "No"
+
+. 
+. /* Column 4: OLS + Full controls */
+. eststo m4: reg cog_index m_k10_std $full_controls, ///
+>     cluster(ea_id)
+
+Linear regression                               Number of obs     =      1,242
+                                                F(7, 253)         =       1.47
+                                                Prob > F          =     0.1772
+                                                R-squared         =     0.0081
+                                                Root MSE          =     1.0079
+
+                                (Std. err. adjusted for 254 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |  -.0028262   .0324084    -0.09   0.931    -.0666508    .0609984
+       c_age |   .0174325   .0099315     1.76   0.080    -.0021263    .0369914
+  1.c_female |  -.0000994    .056092    -0.00   0.999    -.1105662    .1103674
+m_age_harm~d |   .0005304   .0029312     0.18   0.857    -.0052424    .0063031
+m_mother_e~s |   .0146871   .0116248     1.26   0.208    -.0082066    .0375808
+     hh_size |  -.0047526   .0161242    -0.29   0.768    -.0365074    .0270021
+ln_pc_cons~n |   .0837835   .0467701     1.79   0.074     -.008325    .1758919
+       _cons |  -.4584209   .2761061    -1.66   0.098     -1.00218    .0853381
+------------------------------------------------------------------------------
+
+. estadd local ea_fe "No"
+
+added macro:
+              e(ea_fe) : "No"
+
+. estadd local wave_fe "No"
+
+added macro:
+            e(wave_fe) : "No"
+
+. 
+. /* Column 5: EA Fixed Effects + Full controls */
+. eststo m5: reghdfe cog_index m_k10_std $child_controls $maternal_controls ///
+>     hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 29 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,213
+Absorbing 2 HDFE groups                           F(   7,    224) =       2.26
+Statistics robust to heteroskedasticity           Prob > F        =     0.0304
+                                                  R-squared       =     0.2130
+                                                  Adj R-squared   =     0.0277
+                                                  Within R-sq.    =     0.0115
+Number of clusters (ea_id)   =        225         Root MSE        =     1.0004
+
+                                (Std. err. adjusted for 225 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |   .0058352   .0485696     0.12   0.904    -.0898765    .1015469
+       c_age |   .0156184   .0105088     1.49   0.139    -.0050904    .0363272
+  1.c_female |    .067568   .0640239     1.06   0.292    -.0585982    .1937341
+m_age_harm~d |   .0032449   .0037906     0.86   0.393    -.0042249    .0107148
+m_mother_e~s |   .0324265   .0122317     2.65   0.009     .0083226    .0565305
+     hh_size |  -.0038226   .0212513    -0.18   0.857    -.0457006    .0380555
+ln_pc_cons~n |   .1302946   .0818716     1.59   0.113    -.0310426    .2916318
+       _cons |  -.8580755   .3891493    -2.21   0.028    -1.624937   -.0912135
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       225         225           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estadd local ea_fe "Yes"
+
+added macro:
+              e(ea_fe) : "Yes"
+
+. estadd local wave_fe "Yes"
+
+added macro:
+            e(wave_fe) : "Yes"
+
+. 
+. /* Column 6: Child Fixed Effects */
+. eststo m6: reghdfe cog_index m_k10_std c_age i.c_female hh_size, ///
+>     absorb(person_id wave) cluster(ea_id)
+(dropped 5398 singleton observations)
+(MWFE estimator converged in 4 iterations)
+
+HDFE Linear regression                            Number of obs   =      6,583
+Absorbing 2 HDFE groups                           F(   4,    333) =       1.03
+Statistics robust to heteroskedasticity           Prob > F        =     0.3925
+                                                  R-squared       =     0.4820
+                                                  Adj R-squared   =     0.0592
+                                                  Within R-sq.    =     0.0014
+Number of clusters (ea_id)   =        334         Root MSE        =     0.8914
+
+                                (Std. err. adjusted for 334 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |   .0137353   .0187104     0.73   0.463    -.0230701    .0505408
+       c_age |   .0089116   .0145651     0.61   0.541    -.0197397    .0375629
+  1.c_female |   .0559651   .1583157     0.35   0.724    -.2554597      .36739
+     hh_size |   .0224268   .0128591     1.74   0.082    -.0028684    .0477221
+       _cons |  -.1523366   .1901331    -0.80   0.424      -.52635    .2216768
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   person_id |      2953        2953           0    *|
+        wave |         3           1           2     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estadd local ea_fe "Child FE"
+
+added macro:
+              e(ea_fe) : "Child FE"
+
+. estadd local wave_fe "Yes"
+
+added macro:
+            e(wave_fe) : "Yes"
+
+. 
+. /* LaTeX output */
+. cap noi esttab m1 m2 m3 m4 m5 m6 using "$results/Table6_MainResults_CogIndex.
+> tex", replace ///
+>     b(3) se(3) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     title("Effect of Maternal Depression on Child Cognitive Development") ///
+>     mtitles("OLS" "OLS" "OLS" "OLS" "EA FE" "Child FE") ///
+>     keep(m_k10_std m_age_harmonized m_mother_educ_years ///
+>          c_age hh_size ln_pc_consumption) ///
+>     order(m_k10_std c_age m_age_harmonized m_mother_educ_years ///
+>           hh_size ln_pc_consumption) ///
+>     coeflabels( ///
+>         m_k10_std "Maternal depression (std. K10)" ///
+>         c_age "Child age" ///
+>         m_age_harmonized "Mother's age" ///
+>         m_mother_educ_years "Mother's education (years)" ///
+>         hh_size "Household size" ///
+>         ln_pc_consumption "Log per capita consumption" ///
+>     ) ///
+>     stats(ea_fe wave_fe N r2 r2_a, ///
+>         labels("EA/Child FE" "Wave FE" "Observations" "\$R^2$" "Adj. \$R^2$")
+>  ///
+>         fmt(%s %s %9.0fc %9.3f %9.3f)) ///
+>     addnotes("Standard errors clustered at the EA level in parentheses." ///
+>              "Dependent variable: composite cognitive index (average of stand
+> ardized" ///
+>              "Raven's, digit span forward/backward, math, and English scores)
+> ." ///
+>              "*** p$<$0.01, ** p$<$0.05, * p$<$0.1") ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table6_MainResults_CogIndex.tex)
+
+. 
+. /* Text output */
+. cap noi esttab m1 m2 m3 m4 m5 m6 using "$results/Table6_MainResults_CogIndex.
+> txt", replace ///
+>     b(3) se(3) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     title("Effect of Maternal Depression on Child Cognitive Development") ///
+>     mtitles("OLS" "OLS" "OLS" "OLS" "EA FE" "Child FE") ///
+>     keep(m_k10_std m_age_harmonized m_mother_educ_years ///
+>          c_age hh_size ln_pc_consumption) ///
+>     stats(N r2 r2_a, labels("Observations" "R-squared" "Adj. R-squared") ///
+>         fmt(%9.0fc %9.3f %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table6_MainResults_CogIndex.txt)
+
+. 
+. /* Excel output */
+. cap noi esttab m1 m2 m3 m4 m5 m6 using "$results/Table6_MainResults_CogIndex.
+> csv", replace ///
+>     b(3) se(3) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     stats(N r2, fmt(%9.0fc %9.3f)) csv
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table6_MainResults_CogIndex.csv)
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 7: RESULTS BY INDIVIDUAL COGNITIVE TEST
+>     Each column = different cognitive outcome
+> =============================================================================
+> =*/
+. 
+. eststo clear
+
+. 
+. /* Raven's Progressive Matrices */
+. eststo t1: reghdfe ravens_std m_k10_std $child_controls $maternal_controls //
+> /
+>     hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 29 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,213
+Absorbing 2 HDFE groups                           F(   7,    224) =       2.26
+Statistics robust to heteroskedasticity           Prob > F        =     0.0304
+                                                  R-squared       =     0.2130
+                                                  Adj R-squared   =     0.0277
+                                                  Within R-sq.    =     0.0115
+Number of clusters (ea_id)   =        225         Root MSE        =     1.0004
+
+                                (Std. err. adjusted for 225 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+  ravens_std | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |   .0058352   .0485696     0.12   0.904    -.0898765    .1015469
+       c_age |   .0156184   .0105088     1.49   0.139    -.0050904    .0363272
+  1.c_female |    .067568   .0640239     1.06   0.292    -.0585982    .1937341
+m_age_harm~d |   .0032449   .0037906     0.86   0.393    -.0042249    .0107148
+m_mother_e~s |   .0324265   .0122317     2.65   0.009     .0083226    .0565305
+     hh_size |  -.0038226   .0212513    -0.18   0.857    -.0457006    .0380555
+ln_pc_cons~n |   .1302946   .0818716     1.59   0.113    -.0310426    .2916318
+       _cons |  -.8580755   .3891493    -2.21   0.028    -1.624937   -.0912135
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       225         225           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. estadd local controls "Yes"
+
+added macro:
+           e(controls) : "Yes"
+
+. estadd local fe "EA + Wave"
+
+added macro:
+                 e(fe) : "EA + Wave"
+
+. 
+. /* Digit Span Forward -- may have insufficient observations */
+. cap noi eststo t2: reghdfe dsf_std m_k10_std $child_controls $maternal_contro
+> ls ///
+>     hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+insufficient observations
+
+. if _rc == 0 {
+.     estadd local controls "Yes"
+.     estadd local fe "EA + Wave"
+. }
+
+. 
+. /* Digit Span Backward -- may have insufficient observations */
+. cap noi eststo t3: reghdfe dsb_std m_k10_std $child_controls $maternal_contro
+> ls ///
+>     hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+insufficient observations
+
+. if _rc == 0 {
+.     estadd local controls "Yes"
+.     estadd local fe "EA + Wave"
+. }
+
+. 
+. /* Math -- may have insufficient observations */
+. cap noi eststo t4: reghdfe math_std m_k10_std $child_controls $maternal_contr
+> ols ///
+>     hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+insufficient observations
+
+. if _rc == 0 {
+.     estadd local controls "Yes"
+.     estadd local fe "EA + Wave"
+. }
+
+. 
+. /* English -- may have insufficient observations */
+. cap noi eststo t5: reghdfe english_std m_k10_std $child_controls $maternal_co
+> ntrols ///
+>     hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+insufficient observations
+
+. if _rc == 0 {
+.     estadd local controls "Yes"
+.     estadd local fe "EA + Wave"
+. }
+
+. 
+. /* Composite Index (for reference) */
+. cap noi eststo t6: reghdfe cog_index m_k10_std $child_controls $maternal_cont
+> rols ///
+>     hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 29 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,213
+Absorbing 2 HDFE groups                           F(   7,    224) =       2.26
+Statistics robust to heteroskedasticity           Prob > F        =     0.0304
+                                                  R-squared       =     0.2130
+                                                  Adj R-squared   =     0.0277
+                                                  Within R-sq.    =     0.0115
+Number of clusters (ea_id)   =        225         Root MSE        =     1.0004
+
+                                (Std. err. adjusted for 225 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |   .0058352   .0485696     0.12   0.904    -.0898765    .1015469
+       c_age |   .0156184   .0105088     1.49   0.139    -.0050904    .0363272
+  1.c_female |    .067568   .0640239     1.06   0.292    -.0585982    .1937341
+m_age_harm~d |   .0032449   .0037906     0.86   0.393    -.0042249    .0107148
+m_mother_e~s |   .0324265   .0122317     2.65   0.009     .0083226    .0565305
+     hh_size |  -.0038226   .0212513    -0.18   0.857    -.0457006    .0380555
+ln_pc_cons~n |   .1302946   .0818716     1.59   0.113    -.0310426    .2916318
+       _cons |  -.8580755   .3891493    -2.21   0.028    -1.624937   -.0912135
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       225         225           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. if _rc == 0 {
+.     estadd local controls "Yes"
+
+added macro:
+           e(controls) : "Yes"
+.     estadd local fe "EA + Wave"
+
+added macro:
+                 e(fe) : "EA + Wave"
+. }
+
+. 
+. /* LaTeX output -- only include estimates that exist */
+. local table7_models ""
+
+. foreach m in t1 t2 t3 t4 t5 t6 {
+  2.     cap estimates describe `m'
+  3.     if _rc == 0 local table7_models "`table7_models' `m'"
+  4. }
+
+. 
+. cap noi esttab `table7_models' using "$results/Table7_ResultsByTest.tex", rep
+> lace ///
+>     b(3) se(3) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     title("Effect of Maternal Depression on Individual Cognitive Tests") ///
+>     keep(m_k10_std) ///
+>     coeflabels(m_k10_std "Maternal depression (std. K10)") ///
+>     stats(controls fe N r2, ///
+>         labels("Controls" "Fixed Effects" "Observations" "\$R^2$") ///
+>         fmt(%s %s %9.0fc %9.3f)) ///
+>     addnotes("Standard errors clustered at the EA level in parentheses." ///
+>              "All models include EA and wave fixed effects." ///
+>              "Controls: child age, child gender, mother's age, mother's educa
+> tion," ///
+>              "household size, and log per capita consumption." ///
+>              "*** p$<$0.01, ** p$<$0.05, * p$<$0.1") ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table7_ResultsByTest.tex)
+
+. 
+. cap noi esttab `table7_models' using "$results/Table7_ResultsByTest.txt", rep
+> lace ///
+>     b(3) se(3) star(* 0.10 ** 0.05 *** 0.01) ///
+>     mtitles("Raven's" "Digit Fwd" "Digit Bwd" "Math" "English" "Composite") /
+> //
+>     keep(m_k10_std) ///
+>     stats(controls fe N r2, fmt(%s %s %9.0fc %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table7_ResultsByTest.txt)
+
+. 
+. cap noi esttab `table7_models' using "$results/Table7_ResultsByTest.csv", rep
+> lace ///
+>     b(3) se(3) star(* 0.10 ** 0.05 *** 0.01) csv ///
+>     stats(N r2, fmt(%9.0fc %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table7_ResultsByTest.csv)
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 8: BINARY DEPRESSION INDICATOR
+>     Using depressed (K10 >= 20) instead of continuous K10
+> =============================================================================
+> =*/
+. 
+. eststo clear
+
+. 
+. cap noi eststo b1: reg cog_index m_depressed_binary $full_controls, ///
+>     cluster(ea_id)
+
+Linear regression                               Number of obs     =      1,242
+                                                F(7, 253)         =       1.46
+                                                Prob > F          =     0.1808
+                                                R-squared         =     0.0083
+                                                Root MSE          =     1.0078
+
+                                (Std. err. adjusted for 254 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+m_depresse~y |   .0228659   .0662215     0.35   0.730    -.1075497    .1532814
+       c_age |   .0173118   .0099526     1.74   0.083    -.0022888    .0369123
+  1.c_female |   .0003685   .0560597     0.01   0.995    -.1100347    .1107716
+m_age_harm~d |   .0004952   .0029352     0.17   0.866    -.0052854    .0062758
+m_mother_e~s |   .0150677   .0117241     1.29   0.200    -.0080214    .0381569
+     hh_size |  -.0053829   .0160648    -0.34   0.738    -.0370208    .0262549
+ln_pc_cons~n |   .0829302   .0467455     1.77   0.077    -.0091297    .1749901
+       _cons |  -.4635154    .281505    -1.65   0.101    -1.017907    .0908764
+------------------------------------------------------------------------------
+
+. 
+. cap noi eststo b2: reghdfe cog_index m_depressed_binary $child_controls ///
+>     $maternal_controls hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 29 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,213
+Absorbing 2 HDFE groups                           F(   7,    224) =       2.26
+Statistics robust to heteroskedasticity           Prob > F        =     0.0308
+                                                  R-squared       =     0.2130
+                                                  Adj R-squared   =     0.0277
+                                                  Within R-sq.    =     0.0115
+Number of clusters (ea_id)   =        225         Root MSE        =     1.0004
+
+                                (Std. err. adjusted for 225 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+m_depresse~y |   .0125315   .0939054     0.13   0.894    -.1725195    .1975826
+       c_age |   .0156235   .0105079     1.49   0.138    -.0050835    .0363304
+  1.c_female |   .0677259   .0639559     1.06   0.291    -.0583062     .193758
+m_age_harm~d |   .0032298   .0037801     0.85   0.394    -.0042192    .0106788
+m_mother_e~s |   .0323944   .0122057     2.65   0.009     .0083418     .056447
+     hh_size |  -.0039801   .0212997    -0.19   0.852    -.0459535    .0379933
+ln_pc_cons~n |    .129872   .0814819     1.59   0.112    -.0306971    .2904412
+       _cons |  -.8606961   .3900372    -2.21   0.028    -1.629308   -.0920844
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       225         225           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. cap noi eststo b3: reghdfe ravens_std m_depressed_binary $child_controls ///
+>     $maternal_controls hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 29 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,213
+Absorbing 2 HDFE groups                           F(   7,    224) =       2.26
+Statistics robust to heteroskedasticity           Prob > F        =     0.0308
+                                                  R-squared       =     0.2130
+                                                  Adj R-squared   =     0.0277
+                                                  Within R-sq.    =     0.0115
+Number of clusters (ea_id)   =        225         Root MSE        =     1.0004
+
+                                (Std. err. adjusted for 225 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+  ravens_std | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+m_depresse~y |   .0125315   .0939054     0.13   0.894    -.1725195    .1975826
+       c_age |   .0156235   .0105079     1.49   0.138    -.0050835    .0363304
+  1.c_female |   .0677259   .0639559     1.06   0.291    -.0583062     .193758
+m_age_harm~d |   .0032298   .0037801     0.85   0.394    -.0042192    .0106788
+m_mother_e~s |   .0323944   .0122057     2.65   0.009     .0083418     .056447
+     hh_size |  -.0039801   .0212997    -0.19   0.852    -.0459535    .0379933
+ln_pc_cons~n |    .129872   .0814819     1.59   0.112    -.0306971    .2904412
+       _cons |  -.8606961   .3900372    -2.21   0.028    -1.629308   -.0920844
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       225         225           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. cap noi eststo b4: reghdfe math_std m_depressed_binary $child_controls ///
+>     $maternal_controls hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+insufficient observations
+
+. 
+. cap noi eststo b5: reghdfe english_std m_depressed_binary $child_controls ///
+>     $maternal_controls hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+insufficient observations
+
+. 
+. local b_models ""
+
+. foreach m in b1 b2 b3 b4 b5 {
+  2.     cap estimates describe `m'
+  3.     if _rc == 0 local b_models "`b_models' `m'"
+  4. }
+
+. 
+. cap noi esttab `b_models' using "$results/Table8_BinaryDepression.tex", repla
+> ce ///
+>     b(3) se(3) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     title("Effect of Maternal Depression (Binary) on Child Cognitive Outcomes
+> ") ///
+>     mtitles("Cog Index" "Cog Index" "Raven's" "Math" "English") ///
+>     keep(m_depressed_binary) ///
+>     coeflabels(m_depressed_binary "Mother depressed (K10 $\geq$ 20)") ///
+>     indicate("Child controls = c_age 1.c_female" ///
+>              "Maternal controls = m_age_harmonized m_mother_educ_years" ///
+>              "Household controls = hh_size ln_pc_consumption") ///
+>     stats(N r2, labels("Observations" "\$R^2$") fmt(%9.0fc %9.3f)) ///
+>     addnotes("Standard errors clustered at the EA level in parentheses." ///
+>              "Depressed = K10 score $\geq$ 20 (mild, moderate, or severe depr
+> ession)." ///
+>              "*** p$<$0.01, ** p$<$0.05, * p$<$0.1") ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table8_BinaryDepression.tex)
+
+. 
+. cap noi esttab `b_models' using "$results/Table8_BinaryDepression.txt", repla
+> ce ///
+>     b(3) se(3) star(* 0.10 ** 0.05 *** 0.01) ///
+>     mtitles("Cog Index" "Cog Index" "Raven's" "Math" "English") ///
+>     keep(m_depressed_binary) ///
+>     stats(N r2, fmt(%9.0fc %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table8_BinaryDepression.txt)
+
+. 
+. cap noi esttab `b_models' using "$results/Table8_BinaryDepression.csv", repla
+> ce ///
+>     b(3) se(3) star(* 0.10 ** 0.05 *** 0.01) csv ///
+>     stats(N r2, fmt(%9.0fc %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table8_BinaryDepression.csv)
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 9: DEPRESSION SEVERITY CATEGORIES
+> =============================================================================
+> =*/
+. 
+. eststo clear
+
+. 
+. /* Generate severity dummies (base = Low/no depression) */
+. gen dep_mild = (m_depression_cat == 1) if m_depression_cat < .
+(13 missing values generated)
+
+. gen dep_moderate = (m_depression_cat == 2) if m_depression_cat < .
+(13 missing values generated)
+
+. gen dep_severe = (m_depression_cat == 3) if m_depression_cat < .
+(13 missing values generated)
+
+. 
+. cap noi eststo s1: reghdfe cog_index dep_mild dep_moderate dep_severe ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 30 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,208
+Absorbing 2 HDFE groups                           F(   9,    223) =       1.66
+Statistics robust to heteroskedasticity           Prob > F        =     0.1001
+                                                  R-squared       =     0.2095
+                                                  Adj R-squared   =     0.0214
+                                                  Within R-sq.    =     0.0112
+Number of clusters (ea_id)   =        224         Root MSE        =     1.0012
+
+                                (Std. err. adjusted for 224 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    dep_mild |   .0274433   .1070254     0.26   0.798    -.1834673    .2383539
+dep_moderate |  -.0031998    .127451    -0.03   0.980    -.2543623    .2479627
+  dep_severe |  -.1096764   .1528995    -0.72   0.474    -.4109891    .1916364
+       c_age |   .0157648   .0105796     1.49   0.138     -.005084    .0366135
+  1.c_female |   .0602517    .063766     0.94   0.346    -.0654094    .1859127
+m_age_harm~d |   .0033663   .0037994     0.89   0.377    -.0041211    .0108536
+m_mother_e~s |   .0310447   .0118667     2.62   0.010     .0076594      .05443
+     hh_size |  -.0048628   .0207313    -0.23   0.815     -.045717    .0359914
+ln_pc_cons~n |   .1162849   .0824287     1.41   0.160     -.046154    .2787237
+       _cons |  -.7908102    .390716    -2.02   0.044    -1.560778   -.0208422
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       224         224           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. cap noi eststo s2: reghdfe ravens_std dep_mild dep_moderate dep_severe ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 30 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,208
+Absorbing 2 HDFE groups                           F(   9,    223) =       1.66
+Statistics robust to heteroskedasticity           Prob > F        =     0.1001
+                                                  R-squared       =     0.2095
+                                                  Adj R-squared   =     0.0214
+                                                  Within R-sq.    =     0.0112
+Number of clusters (ea_id)   =        224         Root MSE        =     1.0012
+
+                                (Std. err. adjusted for 224 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+  ravens_std | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    dep_mild |   .0274433   .1070254     0.26   0.798    -.1834673    .2383539
+dep_moderate |  -.0031998    .127451    -0.03   0.980    -.2543623    .2479627
+  dep_severe |  -.1096764   .1528995    -0.72   0.474    -.4109891    .1916364
+       c_age |   .0157648   .0105796     1.49   0.138     -.005084    .0366135
+  1.c_female |   .0602517    .063766     0.94   0.346    -.0654094    .1859127
+m_age_harm~d |   .0033663   .0037994     0.89   0.377    -.0041211    .0108536
+m_mother_e~s |   .0310447   .0118667     2.62   0.010     .0076594      .05443
+     hh_size |  -.0048628   .0207313    -0.23   0.815     -.045717    .0359914
+ln_pc_cons~n |   .1162849   .0824287     1.41   0.160     -.046154    .2787237
+       _cons |  -.7908102    .390716    -2.02   0.044    -1.560778   -.0208422
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       224         224           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. cap noi eststo s3: reghdfe math_std dep_mild dep_moderate dep_severe ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+insufficient observations
+
+. 
+. cap noi eststo s4: reghdfe english_std dep_mild dep_moderate dep_severe ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+insufficient observations
+
+. 
+. local s_models ""
+
+. foreach m in s1 s2 s3 s4 {
+  2.     cap estimates describe `m'
+  3.     if _rc == 0 local s_models "`s_models' `m'"
+  4. }
+
+. cap noi esttab `s_models' using "$results/Table9_DepressionSeverity.tex", rep
+> lace ///
+>     b(3) se(3) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     title("Effect of Maternal Depression Severity on Child Cognitive Outcomes
+> ") ///
+>     mtitles("Cog Index" "Raven's" "Math" "English") ///
+>     keep(dep_mild dep_moderate dep_severe) ///
+>     coeflabels( ///
+>         dep_mild "Mild depression (K10: 20--24)" ///
+>         dep_moderate "Moderate depression (K10: 25--29)" ///
+>         dep_severe "Severe depression (K10: 30--50)" ///
+>     ) ///
+>     indicate("Controls = c_age 1.c_female m_age_harmonized m_mother_educ_year
+> s hh_size ln_pc_consumption") ///
+>     stats(N r2, labels("Observations" "\$R^2$") fmt(%9.0fc %9.3f)) ///
+>     addnotes("Standard errors clustered at the EA level in parentheses." ///
+>              "Reference category: Low/no depression (K10: 10--19)." ///
+>              "All models include EA and wave fixed effects." ///
+>              "*** p$<$0.01, ** p$<$0.05, * p$<$0.1") ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table9_DepressionSeverity.tex)
+
+. 
+. cap noi esttab `s_models' using "$results/Table9_DepressionSeverity.txt", rep
+> lace ///
+>     b(3) se(3) star(* 0.10 ** 0.05 *** 0.01) ///
+>     mtitles("Cog Index" "Raven's" "Math" "English") ///
+>     keep(dep_mild dep_moderate dep_severe) ///
+>     stats(N r2, fmt(%9.0fc %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table9_DepressionSeverity.txt)
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 10: EFFECT ON CHILD ANTHROPOMETRY (HAZ, WAZ)
+> =============================================================================
+> =*/
+. 
+. eststo clear
+
+. 
+. cap noi eststo a1: reghdfe haz_approx m_k10_std $child_controls $maternal_con
+> trols ///
+>     hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 31 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,329
+Absorbing 2 HDFE groups                           F(   7,    225) =     255.70
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.7378
+                                                  Adj R-squared   =     0.6823
+                                                  Within R-sq.    =     0.6052
+Number of clusters (ea_id)   =        226         Root MSE        =     0.4505
+
+                                (Std. err. adjusted for 226 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+  haz_approx | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |   .0296637   .0246863     1.20   0.231    -.0189823    .0783096
+       c_age |   .1517744   .0043511    34.88   0.000     .1432003    .1603486
+  1.c_female |   .0049208   .0246583     0.20   0.842    -.0436699    .0535116
+m_age_harm~d |  -.0003024   .0024662    -0.12   0.903    -.0051622    .0045574
+m_mother_e~s |  -.0181553   .0105507    -1.72   0.087    -.0389462    .0026356
+     hh_size |  -.0168927   .0150805    -1.12   0.264    -.0466097    .0128243
+ln_pc_cons~n |  -.0125314   .0474682    -0.26   0.792    -.1060705    .0810077
+       _cons |  -.9453844   .3048092    -3.10   0.002     -1.54603   -.3447385
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       226         226           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. cap noi eststo a2: reghdfe waz_approx m_k10_std $child_controls $maternal_con
+> trols ///
+>     hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 30 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,333
+Absorbing 2 HDFE groups                           F(   7,    226) =     212.94
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.7439
+                                                  Adj R-squared   =     0.6896
+                                                  Within R-sq.    =     0.6556
+Number of clusters (ea_id)   =        227         Root MSE        =     0.4660
+
+                                (Std. err. adjusted for 227 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+  waz_approx | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |    .025789   .0284435     0.91   0.366    -.0302594    .0818374
+       c_age |   .1773393   .0049444    35.87   0.000     .1675962    .1870824
+  1.c_female |   .0452067   .0293567     1.54   0.125    -.0126412    .1030547
+m_age_harm~d |   .0006314   .0022157     0.28   0.776    -.0037347    .0049974
+m_mother_e~s |   .0072305   .0101922     0.71   0.479    -.0128534    .0273143
+     hh_size |  -.0008417   .0155779    -0.05   0.957    -.0315382    .0298549
+ln_pc_cons~n |   .0228412   .0473901     0.48   0.630    -.0705418    .1162243
+       _cons |  -1.697798   .2971721    -5.71   0.000    -2.283381   -1.112216
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       227         227           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. cap noi eststo a3: reghdfe haz_approx m_depressed_binary $child_controls ///
+>     $maternal_controls hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 31 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,329
+Absorbing 2 HDFE groups                           F(   7,    225) =     246.55
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.7384
+                                                  Adj R-squared   =     0.6830
+                                                  Within R-sq.    =     0.6061
+Number of clusters (ea_id)   =        226         Root MSE        =     0.4500
+
+                                (Std. err. adjusted for 226 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+  haz_approx | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+m_depresse~y |   .0774842   .0567393     1.37   0.173    -.0343243    .1892927
+       c_age |    .151685   .0043611    34.78   0.000     .1430912    .1602788
+  1.c_female |   .0068971   .0247368     0.28   0.781    -.0418483    .0556426
+m_age_harm~d |  -.0003916   .0024355    -0.16   0.872    -.0051909    .0044078
+m_mother_e~s |  -.0184582   .0105376    -1.75   0.081    -.0392232    .0023067
+     hh_size |  -.0178984   .0148186    -1.21   0.228    -.0470993    .0113025
+ln_pc_cons~n |  -.0155967   .0469686    -0.33   0.740    -.1081512    .0769579
+       _cons |  -.9595008   .3089711    -3.11   0.002    -1.568348   -.3506538
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       226         226           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. cap noi eststo a4: reghdfe waz_approx m_depressed_binary $child_controls ///
+>     $maternal_controls hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 30 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,333
+Absorbing 2 HDFE groups                           F(   7,    226) =     207.76
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.7448
+                                                  Adj R-squared   =     0.6907
+                                                  Within R-sq.    =     0.6568
+Number of clusters (ea_id)   =        227         Root MSE        =     0.4652
+
+                                (Std. err. adjusted for 227 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+  waz_approx | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+m_depresse~y |   .0872602   .0467842     1.87   0.063    -.0049288    .1794493
+       c_age |   .1772435   .0049479    35.82   0.000     .1674935    .1869934
+  1.c_female |   .0476208    .029489     1.61   0.108    -.0104878    .1057295
+m_age_harm~d |   .0005417   .0021764     0.25   0.804    -.0037469    .0048302
+m_mother_e~s |   .0068989   .0101991     0.68   0.499    -.0131987    .0269964
+     hh_size |  -.0018242   .0154428    -0.12   0.906    -.0322546    .0286062
+ln_pc_cons~n |   .0205929    .046958     0.44   0.661    -.0719386    .1131244
+       _cons |  -1.719946   .2954035    -5.82   0.000    -2.302043   -1.137848
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       227         227           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. local a_models ""
+
+. foreach m in a1 a2 a3 a4 {
+  2.     cap estimates describe `m'
+  3.     if _rc == 0 local a_models "`a_models' `m'"
+  4. }
+
+. cap noi esttab `a_models' using "$results/Table10_Anthropometry.tex", replace
+>  ///
+>     b(3) se(3) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     title("Effect of Maternal Depression on Child Anthropometry") ///
+>     mtitles("HAZ" "WAZ" "HAZ" "WAZ") ///
+>     keep(m_k10_std m_depressed_binary) ///
+>     coeflabels( ///
+>         m_k10_std "Maternal depression (std. K10)" ///
+>         m_depressed_binary "Mother depressed (K10 $\geq$ 20)" ///
+>     ) ///
+>     indicate("Controls = c_age 1.c_female m_age_harmonized m_mother_educ_year
+> s hh_size ln_pc_consumption") ///
+>     stats(N r2, labels("Observations" "\$R^2$") fmt(%9.0fc %9.3f)) ///
+>     addnotes("Standard errors clustered at the EA level in parentheses." ///
+>              "HAZ = height-for-age z-score. WAZ = weight-for-age z-score." //
+> /
+>              "*** p$<$0.01, ** p$<$0.05, * p$<$0.1") ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table10_Anthropometry.tex)
+
+. 
+. cap noi esttab `a_models' using "$results/Table10_Anthropometry.txt", replace
+>  ///
+>     b(3) se(3) star(* 0.10 ** 0.05 *** 0.01) ///
+>     mtitles("HAZ" "WAZ" "HAZ" "WAZ") ///
+>     keep(m_k10_std m_depressed_binary) ///
+>     stats(N r2, fmt(%9.0fc %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table10_Anthropometry.txt)
+
+. 
+. cap noi esttab `a_models' using "$results/Table10_Anthropometry.csv", replace
+>  ///
+>     b(3) se(3) star(* 0.10 ** 0.05 *** 0.01) csv ///
+>     stats(N r2, fmt(%9.0fc %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table10_Anthropometry.csv)
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 11: HETEROGENEITY BY CHILD AGE GROUP
+> =============================================================================
+> =*/
+. 
+. eststo clear
+
+. 
+. forvalues g = 1/3 {
+  2.     cap noi eststo age`g': reghdfe cog_index m_k10_std $child_controls ///
+>         $maternal_controls hh_size ln_pc_consumption ///
+>         if c_age_group == `g', ///
+>         absorb(ea_id wave) cluster(ea_id)
+  3. }
+insufficient observations
+(dropped 67 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =        613
+Absorbing 2 HDFE groups                           F(   7,    167) =       0.95
+Statistics robust to heteroskedasticity           Prob > F        =     0.4705
+                                                  R-squared       =     0.3353
+                                                  Adj R-squared   =     0.0713
+                                                  Within R-sq.    =     0.0143
+Number of clusters (ea_id)   =        168         Root MSE        =     1.0149
+
+                                (Std. err. adjusted for 168 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |   .0250951   .0813602     0.31   0.758    -.1355321    .1857222
+       c_age |  -.0174128   .0342316    -0.51   0.612    -.0849952    .0501697
+  1.c_female |  -.0224786   .0943328    -0.24   0.812    -.2087171    .1637599
+m_age_harm~d |  -.0004776   .0057914    -0.08   0.934    -.0119113    .0109561
+m_mother_e~s |   .0193199   .0268459     0.72   0.473    -.0336813    .0723211
+     hh_size |   .0287078   .0393264     0.73   0.466    -.0489332    .1063487
+ln_pc_cons~n |   .2569196   .1164986     2.21   0.029     .0269197    .4869194
+       _cons |  -.9982725   .6358359    -1.57   0.118    -2.253585    .2570398
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       168         168           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+(dropped 74 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =        413
+Absorbing 2 HDFE groups                           F(   7,    122) =       2.52
+Statistics robust to heteroskedasticity           Prob > F        =     0.0186
+                                                  R-squared       =     0.3004
+                                                  Adj R-squared   =    -0.0185
+                                                  Within R-sq.    =     0.0433
+Number of clusters (ea_id)   =        123         Root MSE        =     0.9891
+
+                                (Std. err. adjusted for 123 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |   .0691019   .0949559     0.73   0.468    -.1188728    .2570766
+       c_age |   -.044153   .0376289    -1.17   0.243    -.1186431    .0303371
+  1.c_female |   .3207451   .1069434     3.00   0.003       .10904    .5324501
+m_age_harm~d |   .0094558   .0059957     1.58   0.117    -.0024132    .0213248
+m_mother_e~s |   .0424058   .0274832     1.54   0.125    -.0119999    .0968115
+     hh_size |  -.0189542   .0387283    -0.49   0.625    -.0956207    .0577123
+ln_pc_cons~n |  -.0573171   .1641697    -0.35   0.728    -.3823075    .2676733
+       _cons |   .1646139   .9521738     0.17   0.863    -1.720309    2.049537
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       123         123           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. local age_models ""
+
+. foreach m in age1 age2 age3 {
+  2.     cap estimates describe `m'
+  3.     if _rc == 0 local age_models "`age_models' `m'"
+  4. }
+
+. cap noi esttab `age_models' using "$results/Table11_HeterogeneityAge.tex", re
+> place ///
+>     b(3) se(3) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     title("Heterogeneous Effects of Maternal Depression by Child Age Group") 
+> ///
+>     mtitles("Ages 0--4" "Ages 5--9" "Ages 10--14") ///
+>     keep(m_k10_std) ///
+>     coeflabels(m_k10_std "Maternal depression (std. K10)") ///
+>     indicate("Controls = c_age 1.c_female m_age_harmonized m_mother_educ_year
+> s hh_size ln_pc_consumption") ///
+>     stats(N r2, labels("Observations" "\$R^2$") fmt(%9.0fc %9.3f)) ///
+>     addnotes("Standard errors clustered at the EA level in parentheses." ///
+>              "*** p$<$0.01, ** p$<$0.05, * p$<$0.1") ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table11_HeterogeneityAge.tex)
+
+. 
+. cap noi esttab `age_models' using "$results/Table11_HeterogeneityAge.txt", re
+> place ///
+>     b(3) se(3) star(* 0.10 ** 0.05 *** 0.01) ///
+>     mtitles("Ages 0-4" "Ages 5-9" "Ages 10-14") ///
+>     keep(m_k10_std) ///
+>     stats(N r2, fmt(%9.0fc %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table11_HeterogeneityAge.txt)
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 12: HETEROGENEITY BY CHILD GENDER
+> =============================================================================
+> =*/
+. 
+. eststo clear
+
+. 
+. cap noi eststo girls: reghdfe cog_index m_k10_std c_age $maternal_controls //
+> /
+>     hh_size ln_pc_consumption if c_female == 1, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 64 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =        541
+Absorbing 2 HDFE groups                           F(   6,    154) =       1.60
+Statistics robust to heteroskedasticity           Prob > F        =     0.1514
+                                                  R-squared       =     0.3277
+                                                  Adj R-squared   =     0.0446
+                                                  Within R-sq.    =     0.0190
+Number of clusters (ea_id)   =        155         Root MSE        =     0.9951
+
+                                (Std. err. adjusted for 155 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |  -.0138954   .0721502    -0.19   0.848    -.1564273    .1286366
+       c_age |   .0245708   .0197099     1.25   0.214    -.0143658    .0635074
+m_age_harm~d |   .0062431   .0055735     1.12   0.264    -.0047673    .0172534
+m_mother_e~s |   .0492597   .0219134     2.25   0.026       .00597    .0925493
+     hh_size |   .0067927   .0415488     0.16   0.870    -.0752865    .0888719
+ln_pc_cons~n |   .1371881   .1239387     1.11   0.270    -.1076513    .3820275
+       _cons |  -1.221276   .6049861    -2.02   0.045    -2.416419   -.0261332
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       155         155           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. cap noi eststo boys: reghdfe cog_index m_k10_std c_age $maternal_controls ///
+>     hh_size ln_pc_consumption if c_female == 0, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 71 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =        566
+Absorbing 2 HDFE groups                           F(   6,    151) =       0.71
+Statistics robust to heteroskedasticity           Prob > F        =     0.6381
+                                                  R-squared       =     0.2890
+                                                  Adj R-squared   =     0.0154
+                                                  Within R-sq.    =     0.0085
+Number of clusters (ea_id)   =        152         Root MSE        =     1.0121
+
+                                (Std. err. adjusted for 152 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |  -.0507454   .0628422    -0.81   0.421     -.174909    .0734181
+       c_age |   .0071755   .0150468     0.48   0.634     -.022554    .0369049
+m_age_harm~d |   .0075652   .0059091     1.28   0.202    -.0041099    .0192403
+m_mother_e~s |   .0086054   .0176482     0.49   0.627    -.0262639    .0434747
+     hh_size |   .0020391   .0277497     0.07   0.942    -.0527886    .0568669
+ln_pc_cons~n |   .1228811   .1155616     1.06   0.289    -.1054455    .3512077
+       _cons |  -.7390802    .520605    -1.42   0.158    -1.767691    .2895307
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       152         152           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. /* Interaction model */
+. gen k10_female = m_k10_std * c_female
+
+. 
+. cap noi eststo interact: reghdfe cog_index m_k10_std c_female k10_female c_ag
+> e ///
+>     $maternal_controls hh_size ln_pc_consumption, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 29 singleton observations)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =      1,213
+Absorbing 2 HDFE groups                           F(   8,    224) =       1.98
+Statistics robust to heteroskedasticity           Prob > F        =     0.0502
+                                                  R-squared       =     0.2130
+                                                  Adj R-squared   =     0.0267
+                                                  Within R-sq.    =     0.0115
+Number of clusters (ea_id)   =        225         Root MSE        =     1.0009
+
+                                (Std. err. adjusted for 225 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   m_k10_std |   .0043872   .0576103     0.08   0.939    -.1091402    .1179146
+    c_female |   .0673003   .0639916     1.05   0.294    -.0588022    .1934029
+  k10_female |   .0030179   .0633653     0.05   0.962    -.1218505    .1278863
+       c_age |   .0156386   .0105373     1.48   0.139    -.0051263    .0364036
+m_age_harm~d |   .0032445   .0037915     0.86   0.393    -.0042271     .010716
+m_mother_e~s |   .0324192   .0122496     2.65   0.009       .00828    .0565583
+     hh_size |  -.0038472   .0212547    -0.18   0.857    -.0457321    .0380376
+ln_pc_cons~n |   .1302446   .0818153     1.59   0.113    -.0309816    .2914707
+       _cons |  -.8577256   .3891604    -2.20   0.029    -1.624609   -.0908418
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       225         225           0    *|
+        wave |         1           1           0     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. local g_models ""
+
+. foreach m in girls boys interact {
+  2.     cap estimates describe `m'
+  3.     if _rc == 0 local g_models "`g_models' `m'"
+  4. }
+
+. cap noi esttab `g_models' using "$results/Table12_HeterogeneityGender.tex", r
+> eplace ///
+>     b(3) se(3) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     title("Heterogeneous Effects of Maternal Depression by Child Gender") ///
+>     mtitles("Girls" "Boys" "Interaction") ///
+>     keep(m_k10_std k10_female c_female) ///
+>     order(m_k10_std c_female k10_female) ///
+>     coeflabels( ///
+>         m_k10_std "Maternal depression (std. K10)" ///
+>         c_female "Child is female" ///
+>         k10_female "Depression $\times$ Female child" ///
+>     ) ///
+>     indicate("Controls = c_age m_age_harmonized m_mother_educ_years hh_size l
+> n_pc_consumption" ///
+>              "EA FE = " "Wave FE = ") ///
+>     stats(N r2, labels("Observations" "\$R^2$") fmt(%9.0fc %9.3f)) ///
+>     addnotes("Standard errors clustered at the EA level in parentheses." ///
+>              "*** p$<$0.01, ** p$<$0.05, * p$<$0.1") ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table12_HeterogeneityGender.tex)
+
+. 
+. cap noi esttab `g_models' using "$results/Table12_HeterogeneityGender.txt", r
+> eplace ///
+>     b(3) se(3) star(* 0.10 ** 0.05 *** 0.01) ///
+>     mtitles("Girls" "Boys" "Interaction") ///
+>     keep(m_k10_std k10_female c_female) ///
+>     stats(N r2, fmt(%9.0fc %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table12_HeterogeneityGender.txt)
+
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers
+> /OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment/progr
+> ams/stata/Draft1_Feb2026/02_main_estimation.log
+  log type:  text
+ closed on:  21 Feb 2026, 21:07:36
+-------------------------------------------------------------------------------

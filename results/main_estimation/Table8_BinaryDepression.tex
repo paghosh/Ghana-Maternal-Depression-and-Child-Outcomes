@@ -1,0 +1,27 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Effect of Maternal Depression (Binary) on Child Cognitive Outcomes}
+\begin{tabular}{l*{3}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}\\
+            &\multicolumn{1}{c}{Cog Index}&\multicolumn{1}{c}{Cog Index}&\multicolumn{1}{c}{Raven's}\\
+\midrule
+Mother depressed (K10 $\geq$ 20)&       0.023         &       0.013         &       0.013         \\
+            &     (0.066)         &     (0.094)         &     (0.094)         \\
+\addlinespace
+Child controls &         Yes         &         Yes         &         Yes         \\
+\addlinespace
+Maternal controls &         Yes         &         Yes         &         Yes         \\
+\addlinespace
+Household controls &         Yes         &         Yes         &         Yes         \\
+\midrule
+Observations&       1,242         &       1,213         &       1,213         \\
+$R^2$       &       0.008         &       0.213         &       0.213         \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{4}{l}{\footnotesize Standard errors clustered at the EA level in parentheses.}\\
+\multicolumn{4}{l}{\footnotesize Depressed = K10 score $\geq$ 20 (mild, moderate, or severe depression).}\\
+\multicolumn{4}{l}{\footnotesize *** p$<$0.01, ** p$<$0.05, * p$<$0.1}\\
+\multicolumn{4}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

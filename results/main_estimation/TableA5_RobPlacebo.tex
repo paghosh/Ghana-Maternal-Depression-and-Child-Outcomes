@@ -1,0 +1,35 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Robustness: Placebo and Falsification Tests}
+\begin{tabular}{l*{4}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+            &\multicolumn{1}{c}{Dep{t+1}$}&\multicolumn{1}{c}{Cog{t+1}$}&\multicolumn{1}{c}{Height (15--17)}&\multicolumn{1}{c}{Balanced}\\
+\midrule
+Cognitive index&       0.025         &                     &                     &                     \\
+            &     (0.030)         &                     &                     &                     \\
+\addlinespace
+0.c\_female  &       0.000         &       0.000         &       0.000         &       0.000         \\
+            &         (.)         &         (.)         &         (.)         &         (.)         \\
+\addlinespace
+Maternal depression (std. K10)&                     &       0.040         &      -1.336         &       0.084         \\
+            &                     &     (0.058)         &     (2.345)         &     (0.064)         \\
+\addlinespace
+\_cons      &       0.751         &      -0.337         &      56.520         &      -1.022\sym{*}  \\
+            &     (0.549)         &     (0.605)         &    (51.472)         &     (0.563)         \\
+\addlinespace
+Controls    &         Yes         &         Yes         &         Yes         &         Yes         \\
+\midrule
+Observations&         599         &         540         &          74         &         599         \\
+$R^2$       &       0.592         &       0.328         &       0.630         &       0.319         \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize Standard errors clustered at the EA level in parentheses.}\\
+\multicolumn{5}{l}{\footnotesize Col 1: reverse causality test (current cognition $\rightarrow$ future depression).}\\
+\multicolumn{5}{l}{\footnotesize Col 2: temporal precedence (current depression $\rightarrow$ future cognition).}\\
+\multicolumn{5}{l}{\footnotesize Col 3: placebo outcome (adolescent height, largely determined before survey).}\\
+\multicolumn{5}{l}{\footnotesize Col 4: restricted to children observed in $\geq$ 2 waves.}\\
+\multicolumn{5}{l}{\footnotesize *** p$<$0.01, ** p$<$0.05, * p$<$0.1}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

@@ -1,0 +1,1672 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers
+> /OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment/progr
+> ams/stata/Draft1_Feb2026/01_summary_stats.log
+  log type:  text
+ opened on:  21 Feb 2026, 21:07:07
+
+. 
+. /* Load analysis dataset */
+. use "$programs/analysis_data.dta", clear
+
+. 
+. /* Keep analysis sample */
+. keep if analysis_sample == 1
+(9,191 observations deleted)
+
+. 
+. di _n "=============================================="
+
+==============================================
+
+. di "ANALYSIS SAMPLE SIZE"
+ANALYSIS SAMPLE SIZE
+
+. di "=============================================="
+==============================================
+
+. count
+  13,746
+
+. tab wave
+
+Survey Wave |
+   (1=2009, |
+    2=2012, |
+    3=2018) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |      5,038       36.65       36.65
+          2 |      4,508       32.79       69.45
+          3 |      4,200       30.55      100.00
+------------+-----------------------------------
+      Total |     13,746      100.00
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 1: SUMMARY STATISTICS — FULL SAMPLE
+> =============================================================================
+> =*/
+. 
+. /* Panel A: Child Characteristics */
+. local child_vars "c_age c_female ravens_correct dsf_score dsb_score math_corr
+> ect english_correct cog_index haz_approx waz_approx c_height c_weight attendi
+> ng_school"
+
+. 
+. /* Panel B: Maternal Characteristics */
+. local mother_vars "m_age_harmonized m_k10_score m_depressed_binary m_mother_e
+> duc_years m_weekly_hours m_pay_amount m_read_hw_time m_total_child_time m_car
+> eforkids_yn m_nhis_valid_card m_bmi"
+
+. 
+. /* Panel C: Household Characteristics */
+. local hh_vars "hh_size ln_pc_consumption total_food_exp"
+
+. 
+. 
+. /*--- Table 1: Overall Summary Statistics ---*/
+. /* Using estpost and esttab for professional output */
+. 
+. cap ssc install estout, replace
+
+. cap ssc install outreg2, replace
+
+. 
+. /* Method 1: estpost tabstat */
+. estpost tabstat c_age c_female ///
+>     ravens_correct dsf_score dsb_score math_correct english_correct ///
+>     cog_index haz_approx waz_approx ///
+>     m_age_harmonized m_k10_score m_depressed_binary ///
+>     m_mother_educ_years m_weekly_hours ///
+>     m_read_hw_time m_total_child_time m_careforkids_yn ///
+>     hh_size ln_pc_consumption, ///
+>     statistics(count mean sd min max) columns(statistics)
+
+Summary statistics: count mean sd min max
+     for variables: c_age c_female ravens_correct dsf_score dsb_score math_corr
+> ect english_correct cog_index haz_approx waz_approx m_age_harmonized m_k10_sc
+> ore m_depressed_binary m_mother_educ_years m_weekly_hours m_read_hw_time m_to
+> tal_child_time m_careforkids_yn hh_size ln_pc_consumption
+
+             |  e(count)    e(mean)      e(sd)     e(min)     e(max) 
+-------------+-------------------------------------------------------
+       c_age |     13746    10.4701   3.679525          0         17 
+    c_female |     13746   .4732286   .4993009          0          1 
+ravens_cor~t |     12507   2.153674   1.195393          0          7 
+   dsf_score |     12520          0          0          0          0 
+   dsb_score |      8646          0          0          0          0 
+math_correct |      9875   1.293772   2.422064          0          8 
+english_co~t |      9447   1.310257   2.503642          0          7 
+   cog_index |     12507   .0042566   .9184648  -1.878639   4.166843 
+  haz_approx |     13088   .2591433   .9516541  -3.722316   22.06048 
+  waz_approx |     13091   .2579335   .8500928  -1.703095   9.700129 
+m_age_harm~d |     13746   42.19722    13.3208         15        104 
+ m_k10_score |     13746   18.80824   6.251178          1         46 
+m_depresse~y |     13746   .4209225   .4937251          0          1 
+m_mother_e~s |      1396   6.224212   2.783827          0         12 
+m_weekly_h~s |       734   39.54223   18.98525          4        120 
+m_read_hw_~e |      3788   .9702614   2.093786          0         24 
+m_total_ch~e |      3762   2.609627   3.072135          0         37 
+m_carefork~n |      8706   .4416494   .4966121          0          1 
+     hh_size |     13746   5.859814   2.334253          2         19 
+ln_pc_cons~n |     13718   3.916272   .8304902  -1.252763   6.827449 
+
+. 
+. /* LaTeX output */
+. cap noi esttab using "$results/Table1_SummaryStats.tex", replace ///
+>     cells("count(fmt(%9.0fc)) mean(fmt(%9.3f)) sd(fmt(%9.3f)) min(fmt(%9.3f))
+>  max(fmt(%9.3f))") ///
+>     noobs nonumber nomtitle ///
+>     title("Summary Statistics: Full Analysis Sample") ///
+>     addnotes("Source: Ghana Socioeconomic Panel Survey (GSPS), Waves 1--3." /
+> //
+>              "Sample restricted to mother--child pairs with non-missing mater
+> nal depression (K10)" ///
+>              "and at least one child cognitive test score.") ///
+>     collabels("N" "Mean" "Std. Dev." "Min" "Max") ///
+>     coeflabels( ///
+>         c_age "Child age (years)" ///
+>         c_female "Child is female" ///
+>         ravens_correct "Raven's score (0--12)" ///
+>         dsf_score "Digit span forward (0--8)" ///
+>         dsb_score "Digit span backward (0--7)" ///
+>         math_correct "Math score (0--8)" ///
+>         english_correct "English score (0--7)" ///
+>         cog_index "Cognitive index (std. avg.)" ///
+>         haz_approx "Height-for-age z-score" ///
+>         waz_approx "Weight-for-age z-score" ///
+>         m_age_harmonized "Mother's age" ///
+>         m_k10_score "Mother's K10 depression score (10--50)" ///
+>         m_depressed_binary "Mother depressed (K10 $\geq$ 20)" ///
+>         m_mother_educ_years "Mother's education (years)" ///
+>         m_weekly_hours "Mother's weekly work hours" ///
+>         m_read_hw_time "Reading/homework time w/ child (hrs)" ///
+>         m_total_child_time "Total time with child (hrs)" ///
+>         m_careforkids_yn "Provides care for children" ///
+>         hh_size "Household size" ///
+>         ln_pc_consumption "Log per capita consumption" ///
+>     ) ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table1_SummaryStats.tex)
+
+. 
+. /* Text output */
+. cap noi esttab using "$results/Table1_SummaryStats.txt", replace ///
+>     cells("count(fmt(%9.0fc)) mean(fmt(%9.3f)) sd(fmt(%9.3f)) min(fmt(%9.3f))
+>  max(fmt(%9.3f))") ///
+>     noobs nonumber nomtitle ///
+>     title("Summary Statistics: Full Analysis Sample") ///
+>     collabels("N" "Mean" "Std. Dev." "Min" "Max") ///
+>     coeflabels( ///
+>         c_age "Child age (years)" ///
+>         c_female "Child is female" ///
+>         ravens_correct "Raven's score (0-12)" ///
+>         dsf_score "Digit span forward (0-8)" ///
+>         dsb_score "Digit span backward (0-7)" ///
+>         math_correct "Math score (0-8)" ///
+>         english_correct "English score (0-7)" ///
+>         cog_index "Cognitive index (std. avg.)" ///
+>         haz_approx "Height-for-age z-score" ///
+>         waz_approx "Weight-for-age z-score" ///
+>         m_age_harmonized "Mother's age" ///
+>         m_k10_score "Mother's K10 depression score (10-50)" ///
+>         m_depressed_binary "Mother depressed (K10 >= 20)" ///
+>         m_mother_educ_years "Mother's education (years)" ///
+>         m_weekly_hours "Mother's weekly work hours" ///
+>         m_read_hw_time "Reading/homework time w/ child (hrs)" ///
+>         m_total_child_time "Total time with child (hrs)" ///
+>         m_careforkids_yn "Provides care for children" ///
+>         hh_size "Household size" ///
+>         ln_pc_consumption "Log per capita consumption" ///
+>     )
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table1_SummaryStats.txt)
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 2: SUMMARY STATISTICS BY MATERNAL DEPRESSION STATUS
+> =============================================================================
+> =*/
+. 
+. /* Column 1: Not Depressed (K10 < 20) */
+. /* Column 2: Depressed (K10 >= 20) */
+. /* Column 3: Difference (with t-test p-value) */
+. 
+. local balance_vars "c_age c_female ravens_correct dsf_score dsb_score math_co
+> rrect english_correct cog_index haz_approx waz_approx m_age_harmonized m_moth
+> er_educ_years m_weekly_hours m_read_hw_time m_total_child_time m_careforkids_
+> yn hh_size ln_pc_consumption"
+
+. 
+. /* T-tests for each variable */
+. eststo clear
+
+. 
+. eststo not_dep: estpost summarize c_age c_female ///
+>     ravens_correct dsf_score dsb_score math_correct english_correct ///
+>     cog_index haz_approx waz_approx ///
+>     m_age_harmonized m_mother_educ_years m_weekly_hours ///
+>     m_read_hw_time m_total_child_time m_careforkids_yn ///
+>     hh_size ln_pc_consumption ///
+>     if m_depressed_binary == 0, detail
+
+             |  e(count)   e(sum_w)    e(mean)     e(Var)      e(sd) 
+-------------+-------------------------------------------------------
+       c_age |      7960       7960   10.48744    13.5425   3.680013 
+    c_female |      7960       7960   .4756281   .2494373    .499437 
+ravens_cor~t |      7283       7283   2.157765    1.42979   1.195738 
+   dsf_score |      7290       7290          0          0          0 
+   dsb_score |      5541       5541          0          0          0 
+math_correct |      5879       5879   1.352441   6.036023   2.456832 
+english_co~t |      5713       5713   1.336251    6.36048   2.521999 
+   cog_index |      7283       7283   .0078975   .8188599   .9049088 
+  haz_approx |      7592       7592    .246754   .8482481   .9210039 
+  waz_approx |      7594       7594   .2780778   .7471239   .8643633 
+m_age_harm~d |      7960       7960   41.19535   165.9489   12.88212 
+m_mother_e~s |       715        715   6.502098   8.017853   2.831581 
+m_weekly_h~s |       483        483   40.90476    336.493   18.34375 
+m_read_hw_~e |      2426       2426   .8478634   2.535885   1.592446 
+m_total_ch~e |      2414       2414   2.396299   6.547492   2.558807 
+m_carefork~n |      5735       5735     .43034   .2451902   .4951669 
+     hh_size |      7960       7960   5.697236   5.067765    2.25117 
+ln_pc_cons~n |      7947       7947   3.993009   .6735292   .8206882 
+
+             | e(skewn~)  e(kurto~)     e(sum)     e(min)     e(max) 
+-------------+-------------------------------------------------------
+       c_age |  .0923071   1.939145      83480          0         17 
+    c_female |  .0976035   1.009526       3786          0          1 
+ravens_cor~t |  .2349289   2.961196      15715          0          7 
+   dsf_score |         .          .          0          0          0 
+   dsb_score |         .          .          0          0          0 
+math_correct |  1.512329   3.727985       7951          0          8 
+english_co~t |  1.504392   3.468914       7634          0          7 
+   cog_index |  .2590121   3.057092   57.51739  -1.878639   4.166843 
+  haz_approx |  7.951568   162.5936   1873.357  -3.722316   22.06048 
+  waz_approx |  1.715108   11.60968   2111.723  -1.562619   8.796562 
+m_age_harm~d |  .6835244   3.834978     327915         15         95 
+m_mother_e~s | -.0864669   2.392384       4649          0         12 
+m_weekly_h~s |  .9769605   4.694257      19757          4        120 
+m_read_hw_~e |  4.525586   39.36178   2056.917          0         24 
+m_total_ch~e |  3.792308   31.94071   5784.667          0         37 
+m_carefork~n |  .2813842   1.079177       2468          0          1 
+     hh_size |  1.391795    7.11353      45350          2         19 
+ln_pc_cons~n | -.4206374   4.502567   31732.44  -1.252763   6.803594 
+
+             |     e(p1)      e(p5)     e(p10)     e(p25)     e(p50) 
+-------------+-------------------------------------------------------
+       c_age |         5          5          6          7         10 
+    c_female |         0          0          0          0          0 
+ravens_cor~t |         0          0          1          1          2 
+   dsf_score |         0          0          0          0          0 
+   dsb_score |         0          0          0          0          0 
+math_correct |         0          0          0          0          0 
+english_co~t |         0          0          0          0          0 
+   cog_index | -1.878639   -1.19533  -1.014998  -.6764985  -.1141125 
+  haz_approx | -2.286846  -.6001732  -.3365207  -.0659274   -.002201 
+  waz_approx | -1.081216  -.8001326  -.6222952  -.3214494    .080399 
+m_age_harm~d |        16         21         27         33         39 
+m_mother_e~s |         0          2          3          5          6 
+m_weekly_h~s |         5         14         20         30         40 
+m_read_hw_~e |         0          0          0          0          0 
+m_total_ch~e |         0        .25         .5          1   1.833333 
+m_carefork~n |         0          0          0          0          0 
+     hh_size |         2          3          3          4          5 
+ln_pc_cons~n |  2.014903   2.685577   2.937838   3.478158   4.017823 
+
+             |    e(p75)     e(p90)     e(p95)     e(p99) 
+-------------+--------------------------------------------
+       c_age |        14         16         17         17 
+    c_female |         1          1          1          1 
+ravens_cor~t |         3          4          4          5 
+   dsf_score |         0          0          0          0 
+   dsb_score |         0          0          0          0 
+math_correct |         2          6          7          8 
+english_co~t |         0          7          7          7 
+   cog_index |  .7052617   1.095885   1.524636   2.439563 
+  haz_approx |  .6726382    1.17222   1.361781   1.639227 
+  waz_approx |  .7722118   1.432791   1.774888   2.638987 
+m_age_harm~d |        48         59         66         79 
+m_mother_e~s |         9          9         12         12 
+m_weekly_h~s |        48         70         78        100 
+m_read_hw_~e |         1          2          4          8 
+m_total_ch~e |         3          5        6.5         12 
+m_carefork~n |         1          1          1          1 
+     hh_size |         7          8         10         14 
+ln_pc_cons~n |  4.547894   4.998698   5.269146   5.779199 
+
+. 
+. eststo depressed: estpost summarize c_age c_female ///
+>     ravens_correct dsf_score dsb_score math_correct english_correct ///
+>     cog_index haz_approx waz_approx ///
+>     m_age_harmonized m_mother_educ_years m_weekly_hours ///
+>     m_read_hw_time m_total_child_time m_careforkids_yn ///
+>     hh_size ln_pc_consumption ///
+>     if m_depressed_binary == 1, detail
+
+             |  e(count)   e(sum_w)    e(mean)     e(Var)      e(sd) 
+-------------+-------------------------------------------------------
+       c_age |      5786       5786   10.44625   13.53531   3.679037 
+    c_female |      5786       5786   .4699274   .2491387    .499138 
+ravens_cor~t |      5224       5224   2.147971   1.428033   1.195004 
+   dsf_score |      5230       5230          0          0          0 
+   dsb_score |      3105       3105          0          0          0 
+math_correct |      3996       3996   1.207457   5.605762   2.367649 
+english_co~t |      3734       3734   1.270487    6.12612     2.4751 
+   cog_index |      5224       5224  -.0008193   .8781568   .9371002 
+  haz_approx |      5496       5496   .2762574   .9845961   .9922682 
+  waz_approx |      5497       5497   .2301046   .6876526   .8292482 
+m_age_harm~d |      5786       5786   43.57553   190.0079   13.78433 
+m_mother_e~s |       681        681   5.932452   7.313078    2.70427 
+m_weekly_h~s |       251        251   36.92032   397.5616   19.93895 
+m_read_hw_~e |      1362       1362   1.188277   7.605718   2.757847 
+m_total_ch~e |      1348       1348   2.991654   14.39545   3.794134 
+m_carefork~n |      2971       2971   .4634803     .24875   .4987485 
+     hh_size |      5786       5786   6.083477   5.887412   2.426399 
+ln_pc_cons~n |      5771       5771   3.810601   .6928435   .8323722 
+
+             | e(skewn~)  e(kurto~)     e(sum)     e(min)     e(max) 
+-------------+-------------------------------------------------------
+       c_age |   .024695   2.073067      60442          0         17 
+    c_female |  .1205085   1.014522       2719          0          1 
+ravens_cor~t |  .2404674   2.932654      11221          0          7 
+   dsf_score |         .          .          0          0          0 
+   dsb_score |         .          .          0          0          0 
+math_correct |  1.709592   4.401245       4825          0          8 
+english_co~t |   1.58263   3.717347       4744          0          7 
+   cog_index |  .2370093   2.988503  -4.280122  -1.878639   4.166843 
+  haz_approx |   8.93102   166.8245   1518.311  -3.562608   21.79211 
+  waz_approx |   1.49527   9.982312   1264.885  -1.703095   9.700129 
+m_age_harm~d |  .9506912    3.87666     252128         15        104 
+m_mother_e~s |  .2278534   2.422971       4040          0         12 
+m_weekly_h~s |   .821067   4.090296       9267          5        112 
+m_read_hw_~e |  5.996689   46.80894   1618.433          0         24 
+m_total_ch~e |  4.069785   24.48385    4032.75          0         32 
+m_carefork~n |    .14647   1.021453       1377          0          1 
+     hh_size |  .9307471   4.388893      35199          2         17 
+ln_pc_cons~n |  .0490488   2.795081   21990.98   .9162908   6.827449 
+
+             |     e(p1)      e(p5)     e(p10)     e(p25)     e(p50) 
+-------------+-------------------------------------------------------
+       c_age |         3          5          6          7         10 
+    c_female |         0          0          0          0          0 
+ravens_cor~t |         0          0          1          1          2 
+   dsf_score |         0          0          0          0          0 
+   dsb_score |         0          0          0          0          0 
+math_correct |         0          0          0          0          0 
+english_co~t |         0          0          0          0          0 
+   cog_index | -1.878639  -1.752861  -1.014998  -.9334868  -.1513579 
+  haz_approx | -2.205821  -.6239939  -.3492973  -.0669656   .0604656 
+  waz_approx | -1.103311  -.8103599  -.6322257  -.3632163   .0672754 
+m_age_harm~d |        18         27         29         34         40 
+m_mother_e~s |         1          2          3          4          6 
+m_weekly_h~s |         5          8         14         21         40 
+m_read_hw_~e |         0          0          0          0   .1666667 
+m_total_ch~e |         0        .25         .5          1          2 
+m_carefork~n |         0          0          0          0          0 
+     hh_size |         2          3          3          4          6 
+ln_pc_cons~n |   1.96361   2.505526   2.772589   3.202746   3.780395 
+
+             |    e(p75)     e(p90)     e(p95)     e(p99) 
+-------------+--------------------------------------------
+       c_age |        13         16         16         17 
+    c_female |         1          1          1          1 
+ravens_cor~t |         3          4          4          5 
+   dsf_score |         0          0          0          0 
+   dsb_score |         0          0          0          0 
+math_correct |         0          6          7          8 
+english_co~t |         0          7          7          7 
+   cog_index |  .7122824   1.139656   1.575923   2.439563 
+  haz_approx |  .7110932    1.17222   1.359296   1.675791 
+  waz_approx |  .7020763   1.372584   1.741007   2.454654 
+m_age_harm~d |        50         64         71         83 
+m_mother_e~s |         8          9         10         12 
+m_weekly_h~s |        45         63         72        110 
+m_read_hw_~e |       1.5          3          4         15 
+m_total_ch~e |  3.791667          6          8   24.33333 
+m_carefork~n |         1          1          1          1 
+     hh_size |         7          9         10         14 
+ln_pc_cons~n |  4.412798   4.914492   5.141664   5.736411 
+
+. 
+. /* T-test differences */
+. eststo diff: estpost ttest c_age c_female ///
+>     ravens_correct dsf_score dsb_score math_correct english_correct ///
+>     cog_index haz_approx waz_approx ///
+>     m_age_harmonized m_mother_educ_years m_weekly_hours ///
+>     m_read_hw_time m_total_child_time m_careforkids_yn ///
+>     hh_size ln_pc_consumption, ///
+>     by(m_depressed_binary) unequal
+
+             |      e(b)   e(count)      e(se)       e(t)    e(df_t) 
+-------------+-------------------------------------------------------
+       c_age |  .0411876      13746    .063566   .6479501   12466.59 
+    c_female |  .0057007      13746   .0086253   .6609337   12468.97 
+ravens_cor~t |  .0097938      12507   .0216721   .4519066   11255.18 
+   dsf_score |         0      12520          0          .          . 
+   dsb_score |         0       8646          0          .          . 
+math_correct |  .1449834       9875   .0492905   2.941408    8784.56 
+english_co~t |  .0657632       9447   .0524782   1.253152    8085.21 
+   cog_index |  .0087168      12507   .0167492   .5204319   11012.75 
+  haz_approx | -.0295033      13088   .0170551  -1.729883   11303.76 
+  waz_approx |  .0479732      13091   .0149492   3.209077   12115.89 
+m_age_harm~d | -2.380175      13746   .2317048  -10.27245   11958.53 
+m_mother_e~s |  .5696456       1396   .1481638   3.844702   1393.989 
+m_weekly_h~s |  3.984443        734    1.51016   2.638424   471.0232 
+m_read_hw_~e | -.3404136       3788   .0814219  -4.180862   1881.217 
+m_total_ch~e | -.5953549       3762   .1157213  -5.144731   2044.496 
+m_carefork~n | -.0331403       8706   .0112463  -2.946772   5971.136 
+     hh_size | -.3862412      13746   .0406716  -9.496576   11902.17 
+ln_pc_cons~n |  .1824081      13718   .0143111   12.74588   12330.06 
+
+             |    e(p_l)       e(p)     e(p_u)     e(N_1)    e(mu_1) 
+-------------+-------------------------------------------------------
+       c_age |  .7414854   .5170291   .2585146       7960   10.48744 
+    c_female |  .7456665    .508667   .2543335       7960   .4756281 
+ravens_cor~t |  .6743275    .651345   .3256725       7283   2.157765 
+   dsf_score |         .          .          .       7290          0 
+   dsb_score |         .          .          .       5541          0 
+math_correct |  .9983621   .0032758   .0016379       5879   1.352441 
+english_co~t |  .8949068   .2101865   .1050932       5713   1.336251 
+   cog_index |  .6986135   .6027731   .3013865       7283   .0078975 
+  haz_approx |  .0418393   .0836785   .9581607       7592    .246754 
+  waz_approx |  .9993325   .0013351   .0006675       7594   .2780778 
+m_age_harm~d |  5.94e-25   1.19e-24          1       7960   41.19535 
+m_mother_e~s |  .9999369   .0001261   .0000631        715   6.502098 
+m_weekly_h~s |  .9956975    .008605   .0043025        483   40.90476 
+m_read_hw_~e |  .0000152   .0000304   .9999848       2426   .8478634 
+m_total_ch~e |  1.47e-07   2.94e-07   .9999999       2414   2.396299 
+m_carefork~n |  .0016118   .0032235   .9983882       5735     .43034 
+     hh_size |  1.29e-21   2.58e-21          1       7960   5.697236 
+ln_pc_cons~n |         1   5.62e-37   2.81e-37       7947   3.993009 
+
+             |    e(N_2)    e(mu_2) 
+-------------+----------------------
+       c_age |      5786   10.44625 
+    c_female |      5786   .4699274 
+ravens_cor~t |      5224   2.147971 
+   dsf_score |      5230          0 
+   dsb_score |      3105          0 
+math_correct |      3996   1.207457 
+english_co~t |      3734   1.270487 
+   cog_index |      5224  -.0008193 
+  haz_approx |      5496   .2762574 
+  waz_approx |      5497   .2301046 
+m_age_harm~d |      5786   43.57553 
+m_mother_e~s |       681   5.932452 
+m_weekly_h~s |       251   36.92032 
+m_read_hw_~e |      1362   1.188277 
+m_total_ch~e |      1348   2.991654 
+m_carefork~n |      2971   .4634803 
+     hh_size |      5786   6.083477 
+ln_pc_cons~n |      5771   3.810601 
+
+. 
+. /* LaTeX output for balance table */
+. cap noi esttab not_dep depressed diff using "$results/Table2_BalanceByDepress
+> ion.tex", replace ///
+>     cells("mean(pattern(1 1 0) fmt(%9.3f)) b(pattern(0 0 1) fmt(%9.3f)) se(pa
+> ttern(0 0 1) par fmt(%9.3f))") ///
+>     noobs nonumber ///
+>     mtitles("Not Depressed" "Depressed" "Difference") ///
+>     title("Summary Statistics by Maternal Depression Status") ///
+>     addnotes("Source: Ghana Socioeconomic Panel Survey (GSPS), Waves 1--3." /
+> //
+>              "Not Depressed: K10 score $<$ 20. Depressed: K10 score $\geq$ 20
+> ." ///
+>              "Standard errors of the difference in parentheses." ///
+>              "*** p$<$0.01, ** p$<$0.05, * p$<$0.1") ///
+>     coeflabels( ///
+>         c_age "Child age (years)" ///
+>         c_female "Child is female" ///
+>         ravens_correct "Raven's score" ///
+>         dsf_score "Digit span forward" ///
+>         dsb_score "Digit span backward" ///
+>         math_correct "Math score" ///
+>         english_correct "English score" ///
+>         cog_index "Cognitive index" ///
+>         haz_approx "Height-for-age z-score" ///
+>         waz_approx "Weight-for-age z-score" ///
+>         m_age_harmonized "Mother's age" ///
+>         m_mother_educ_years "Mother's education (years)" ///
+>         m_weekly_hours "Mother's weekly work hours" ///
+>         m_read_hw_time "Reading/homework time (hrs)" ///
+>         m_total_child_time "Total child time (hrs)" ///
+>         m_careforkids_yn "Provides childcare" ///
+>         hh_size "Household size" ///
+>         ln_pc_consumption "Log per capita consumption" ///
+>     ) ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table2_BalanceByDepression.tex)
+
+. 
+. /* Text output */
+. cap noi esttab not_dep depressed diff using "$results/Table2_BalanceByDepress
+> ion.txt", replace ///
+>     cells("mean(pattern(1 1 0) fmt(%9.3f)) b(pattern(0 0 1) fmt(%9.3f)) se(pa
+> ttern(0 0 1) par fmt(%9.3f))") ///
+>     noobs nonumber ///
+>     mtitles("Not Depressed" "Depressed" "Difference") ///
+>     title("Summary Statistics by Maternal Depression Status") ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     coeflabels( ///
+>         c_age "Child age (years)" ///
+>         c_female "Child is female" ///
+>         ravens_correct "Raven's score" ///
+>         dsf_score "Digit span forward" ///
+>         dsb_score "Digit span backward" ///
+>         math_correct "Math score" ///
+>         english_correct "English score" ///
+>         cog_index "Cognitive index" ///
+>         haz_approx "Height-for-age z-score" ///
+>         waz_approx "Weight-for-age z-score" ///
+>         m_age_harmonized "Mother's age" ///
+>         m_mother_educ_years "Mother's education (years)" ///
+>         m_weekly_hours "Mother's weekly work hours" ///
+>         m_read_hw_time "Reading/homework time (hrs)" ///
+>         m_total_child_time "Total child time (hrs)" ///
+>         m_careforkids_yn "Provides childcare" ///
+>         hh_size "Household size" ///
+>         ln_pc_consumption "Log per capita consumption" ///
+>     )
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table2_BalanceByDepression.txt)
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 3: SUMMARY STATISTICS BY WAVE
+> =============================================================================
+> =*/
+. 
+. eststo clear
+
+. 
+. forvalues w = 1/3 {
+  2.     eststo wave`w': estpost summarize c_age c_female ///
+>         ravens_correct dsf_score dsb_score math_correct english_correct ///
+>         cog_index haz_approx waz_approx ///
+>         m_age_harmonized m_k10_score m_depressed_binary ///
+>         m_read_hw_time m_total_child_time ///
+>         hh_size ln_pc_consumption ///
+>         if wave == `w', detail
+  3. }
+
+             |  e(count)   e(sum_w)    e(mean)     e(Var)      e(sd) 
+-------------+-------------------------------------------------------
+       c_age |      5038       5038   10.15859   14.10567   3.755752 
+    c_female |      5038       5038   .4868996    .249878    .499878 
+ravens_cor~t |      4333       4333   2.179321   1.327716   1.152266 
+   dsf_score |      4346       4346          0          0          0 
+   dsb_score |       472        472          0          0          0 
+math_correct |      2756       2756          0          0          0 
+english_co~t |      2328       2328          0          0          0 
+   cog_index |      4333       4333   .0035113   .9903098   .9951431 
+  haz_approx |      4917       4917    .352022   .6286784   .7928924 
+  waz_approx |      4920       4920   .2838885   .8163089   .9034981 
+m_age_harm~d |      5038       5038   42.69135   163.1894   12.77456 
+ m_k10_score |      5038       5038   20.85212   38.17289   6.178421 
+m_depresse~y |      5038       5038   .5587535    .246597   .4965853 
+m_read_hw_~e |         0          0          .          .          . 
+m_total_ch~e |         0          0          .          .          . 
+     hh_size |      5038       5038    6.12505   5.789799     2.4062 
+ln_pc_cons~n |      5025       5025   3.395952   .4114931   .6414773 
+
+             | e(skewn~)  e(kurto~)     e(sum)     e(min)     e(max) 
+-------------+-------------------------------------------------------
+       c_age |  .0295191   2.143639      51179          0         17 
+    c_female |  .0524197   1.002748       2453          0          1 
+ravens_cor~t |  .3654651   3.180123       9443          0          7 
+   dsf_score |         .          .          0          0          0 
+   dsb_score |         .          .          0          0          0 
+math_correct |         .          .          0          0          0 
+english_co~t |         .          .          0          0          0 
+   cog_index |  .3654651   3.180123   15.21462  -1.878639   4.166843 
+  haz_approx | -.9984974   4.868605   1730.892  -3.225935   2.315838 
+  waz_approx |  1.083648   6.102075   1396.732  -1.624552   8.279433 
+m_age_harm~d |  1.091429   4.143849     215079         19        100 
+ m_k10_score |  .5349725   3.221834     105053          1         46 
+m_depresse~y | -.2366534   1.056005       2815          0          1 
+m_read_hw_~e |         .          .          0          .          . 
+m_total_ch~e |         .          .          0          .          . 
+     hh_size |   1.24009   6.149414      30858          2         19 
+ln_pc_cons~n | -.0052425   3.245018   17064.66   .9808293   5.610692 
+
+             |     e(p1)      e(p5)     e(p10)     e(p25)     e(p50) 
+-------------+-------------------------------------------------------
+       c_age |         2          5          5          7         10 
+    c_female |         0          0          0          0          0 
+ravens_cor~t |         0          0          1          1          2 
+   dsf_score |         0          0          0          0          0 
+   dsb_score |         0          0          0          0          0 
+math_correct |         0          0          0          0          0 
+english_co~t |         0          0          0          0          0 
+   cog_index | -1.878639  -1.878639  -1.014998  -1.014998  -.1513579 
+  haz_approx | -2.356005  -.9383424  -.4880825  -.0991606   .3869916 
+  waz_approx | -1.168466  -.8426905  -.6849834  -.3866045   .1299636 
+m_age_harm~d |        24         27         29         34         40 
+ m_k10_score |        10         12         14         16         20 
+m_depresse~y |         0          0          0          0          1 
+m_read_hw_~e |         .          .          .          .          . 
+m_total_ch~e |         .          .          .          .          . 
+     hh_size |         2          3          4          4          6 
+ln_pc_cons~n |  1.824549   2.397895    2.61496   2.965273    3.38439 
+
+             |    e(p75)     e(p90)     e(p95)     e(p99) 
+-------------+--------------------------------------------
+       c_age |        13         15         16         17 
+    c_female |         1          1          1          1 
+ravens_cor~t |         3          4          4          5 
+   dsf_score |         0          0          0          0 
+   dsb_score |         0          0          0          0 
+math_correct |         0          0          0          0 
+english_co~t |         0          0          0          0 
+   cog_index |  .7122824   1.575923   1.575923   2.439563 
+  haz_approx |  .9303951   1.294476   1.456527   1.703666 
+  waz_approx |  .8513432    1.56805   1.947922   2.637493 
+m_age_harm~d |        49         61         70         80 
+ m_k10_score |        25         29         31         38 
+m_depresse~y |         1          1          1          1 
+m_read_hw_~e |         .          .          .          . 
+m_total_ch~e |         .          .          .          . 
+     hh_size |         7          9         10         14 
+ln_pc_cons~n |  3.812203   4.237723    4.46303   4.921197 
+
+             |  e(count)   e(sum_w)    e(mean)     e(Var)      e(sd) 
+-------------+-------------------------------------------------------
+       c_age |      4508       4508   10.50333   13.25825   3.641189 
+    c_female |      4508       4508    .466504   .2489332   .4989321 
+ravens_cor~t |      3974       3974   2.142677   1.476995   1.215317 
+   dsf_score |      3974       3974          0          0          0 
+   dsb_score |      3974       3974          0          0          0 
+math_correct |      2919       2919          0          0          0 
+english_co~t |      2919       2919          0          0          0 
+   cog_index |      3974       3974   .0027936   .9916164   .9957994 
+  haz_approx |      4164       4164   .3609862   .6233435    .789521 
+  waz_approx |      4164       4164   .2854527   .8344166    .913464 
+m_age_harm~d |      4508       4508   38.89663   202.4624   14.22893 
+ m_k10_score |      4508       4508   17.19432   30.83731   5.553136 
+m_depresse~y |      4508       4508   .3085626    .213399   .4619513 
+m_read_hw_~e |      2417       2417   .4610881   1.012862   1.006411 
+m_total_ch~e |      2417       2417   2.085919   4.570646   2.137907 
+     hh_size |      4508       4508   5.607143   5.006712   2.237568 
+ln_pc_cons~n |      4503       4503   4.131786   .5124423   .7158507 
+
+             | e(skewn~)  e(kurto~)     e(sum)     e(min)     e(max) 
+-------------+-------------------------------------------------------
+       c_age |  .1474169    1.87892      47349          0         17 
+    c_female |  .1342857   1.018033       2103          0          1 
+ravens_cor~t |  .2263059   2.847515       8515          0          7 
+   dsf_score |         .          .          0          0          0 
+   dsb_score |         .          .          0          0          0 
+math_correct |         .          .          0          0          0 
+english_co~t |         .          .          0          0          0 
+   cog_index |  .2263059   2.847515   11.10191  -1.752861   3.982759 
+  haz_approx | -1.266112    6.58792   1503.147  -3.722316   2.378504 
+  waz_approx |  1.641417    11.0022   1188.625  -1.530205   8.796562 
+m_age_harm~d |  .7433492   3.799594     175346         15        104 
+ m_k10_score |  .7647333   3.223333      77512         10         45 
+m_depresse~y |  .8289128   1.687096       1391          0          1 
+m_read_hw_~e |  7.681878    128.327    1114.45          0         23 
+m_total_ch~e |  3.464933   23.75399   5041.667          0         24 
+     hh_size |   1.11713   5.125271      25277          2         16 
+ln_pc_cons~n |  -.192607   3.886293   18605.43   .9162908   6.827449 
+
+             |     e(p1)      e(p5)     e(p10)     e(p25)     e(p50) 
+-------------+-------------------------------------------------------
+       c_age |         5          5          6          7         10 
+    c_female |         0          0          0          0          0 
+ravens_cor~t |         0          0          1          1          2 
+   dsf_score |         0          0          0          0          0 
+   dsb_score |         0          0          0          0          0 
+math_correct |         0          0          0          0          0 
+english_co~t |         0          0          0          0          0 
+   cog_index | -1.752861  -1.752861  -.9334868  -.9334868  -.1141125 
+  haz_approx | -2.444657  -.7198182  -.4642866   -.059925   .3981329 
+  waz_approx | -1.050501  -.8001326  -.6749485    -.37566   .0733299 
+m_age_harm~d |        15         17         20         30         37 
+ m_k10_score |        10         10         10         13         16 
+m_depresse~y |         0          0          0          0          0 
+m_read_hw_~e |         0          0          0          0          0 
+m_total_ch~e |         0   .3333333         .5   .8333334        1.5 
+     hh_size |         2          3          3          4          5 
+ln_pc_cons~n |   2.24071   2.939162   3.238678   3.691732   4.154969 
+
+             |    e(p75)     e(p90)     e(p95)     e(p99) 
+-------------+--------------------------------------------
+       c_age |        14         16         17         17 
+    c_female |         1          1          1          1 
+ravens_cor~t |         3          4          4          5 
+   dsf_score |         0          0          0          0 
+   dsb_score |         0          0          0          0 
+math_correct |         0          0          0          0 
+english_co~t |         0          0          0          0 
+   cog_index |  .7052617   1.524636   1.524636    2.34401 
+  haz_approx |  .9411377   1.267001   1.424968    1.64385 
+  waz_approx |  .8430269   1.484441   1.805148   2.579838 
+m_age_harm~d |        46         58         66         80 
+ m_k10_score |        21         25         28         32 
+m_depresse~y |         1          1          1          1 
+m_read_hw_~e |        .5        1.5          2       3.75 
+m_total_ch~e |         3          4       5.25       11.5 
+     hh_size |         7          8         10         13 
+ln_pc_cons~n |  4.592844   4.994957   5.234579   5.801615 
+
+             |  e(count)   e(sum_w)    e(mean)     e(Var)      e(sd) 
+-------------+-------------------------------------------------------
+       c_age |      4200       4200    10.8081   12.93482   3.596502 
+    c_female |      4200       4200   .4640476   .2487667   .4987651 
+ravens_cor~t |      4200       4200   2.137619   1.487606   1.219674 
+   dsf_score |      4200       4200          0          0          0 
+   dsb_score |      4200       4200          0          0          0 
+math_correct |      4200       4200   3.041905   8.475976   2.911353 
+english_co~t |      4200       4200   2.947143   9.275605   3.045588 
+   cog_index |      4200       4200   .0064097   .5525215   .7433179 
+  haz_approx |      4007       4007   .0393383    1.46965   1.212291 
+  waz_approx |      4007       4007   .1974672    .486613   .6975765 
+m_age_harm~d |      4200       4200   45.14714    147.081    12.1277 
+ m_k10_score |      4200       4200   18.08881   40.69871   6.379554 
+m_depresse~y |      4200       4200   .3761905   .2347271   .4844864 
+m_read_hw_~e |      1371       1371   1.867907   9.068305   3.011363 
+m_total_ch~e |      1345       1345   3.550743   16.81511   4.100623 
+     hh_size |      4200       4200   5.812857   5.361492    2.31549 
+ln_pc_cons~n |      4190       4190    4.30867    .685535   .8279704 
+
+             | e(skewn~)  e(kurto~)     e(sum)     e(min)     e(max) 
+-------------+-------------------------------------------------------
+       c_age |  .0467893   1.861047      45394          5         17 
+    c_female |  .1441827   1.020789       1949          0          1 
+ravens_cor~t |  .1423204   2.821285       8978          0          7 
+   dsf_score |         .          .          0          0          0 
+   dsb_score |         .          .          0          0          0 
+math_correct |  .2518948   1.531255      12776          0          8 
+english_co~t |  .2497736   1.264818      12378          0          7 
+   cog_index | -.0142006   1.827183   26.92074   -1.19533   1.874133 
+  haz_approx |  14.35407   213.5547   157.6287  -.2140172   22.06048 
+  waz_approx |  2.749636   24.56201   791.2511  -1.703095   9.700129 
+m_age_harm~d |  1.056203   3.999643     189618         15         99 
+ m_k10_score |  .7284738   3.105671      75973          9         44 
+m_depresse~y |  .5111568   1.261281       1580          0          1 
+m_read_hw_~e |  4.563137   30.82374     2560.9          0         24 
+m_total_ch~e |  3.624173   21.19779    4775.75          0         37 
+     hh_size |  1.153576   5.590941      24414          2         17 
+ln_pc_cons~n | -1.107584   6.959817   18053.33  -1.252763   6.549508 
+
+             |     e(p1)      e(p5)     e(p10)     e(p25)     e(p50) 
+-------------+-------------------------------------------------------
+       c_age |         5          5          6          8         11 
+    c_female |         0          0          0          0          0 
+ravens_cor~t |         0          0          0          1          2 
+   dsf_score |         0          0          0          0          0 
+   dsb_score |         0          0          0          0          0 
+math_correct |         0          0          0          0          3 
+english_co~t |         0          0          0          0          2 
+   cog_index |  -1.19533   -1.19533  -.9359144  -.6764985   .0142069 
+  haz_approx | -.1510594  -.0939587  -.0804621  -.0648892  -.0462017 
+  waz_approx | -.9048694  -.6368936  -.4738276  -.2491841   .0640929 
+m_age_harm~d |        26         30         33         36         42 
+ m_k10_score |        10         10         10         13         17 
+m_depresse~y |         0          0          0          0          0 
+m_read_hw_~e |         0          0          0          0          1 
+m_total_ch~e |         0        .25         .5          1        2.5 
+     hh_size |         2          3          3          4          6 
+ln_pc_cons~n |  2.238047   2.795756   3.287468   3.873802   4.406719 
+
+             |    e(p75)     e(p90)     e(p95)     e(p99) 
+-------------+--------------------------------------------
+       c_age |        14         16         17         17 
+    c_female |         1          1          1          1 
+ravens_cor~t |         3          4          4          5 
+   dsf_score |         0          0          0          0 
+   dsb_score |         0          0          0          0 
+math_correct |         6          7          8          8 
+english_co~t |         6          7          7          7 
+   cog_index |  .6636085   .9442912   1.095885   1.355301 
+  haz_approx | -.0254378  -.0075684   .0004827   .0139012 
+  waz_approx |  .5290809    1.00517   1.330162   2.174001 
+m_age_harm~d |        51         63         69       81.5 
+ m_k10_score |        22         27         30         35 
+m_depresse~y |         1          1          1          1 
+m_read_hw_~e |         2        4.5          6   20.01667 
+m_total_ch~e |         4          7         10   24.33333 
+     hh_size |         7          9         10         14 
+ln_pc_cons~n |  4.851053   5.227626   5.460861   5.974658 
+
+. 
+. /* LaTeX output */
+. cap noi esttab wave1 wave2 wave3 using "$results/Table3_SummaryByWave.tex", r
+> eplace ///
+>     cells("mean(fmt(%9.3f)) sd(par fmt(%9.3f)) count(fmt(%9.0f))") ///
+>     noobs nonumber ///
+>     mtitles("Wave 1 (2009)" "Wave 2 (2012)" "Wave 3 (2018)") ///
+>     title("Summary Statistics by Survey Wave") ///
+>     addnotes("Source: Ghana Socioeconomic Panel Survey (GSPS)." ///
+>              "Standard deviations in parentheses.") ///
+>     coeflabels( ///
+>         c_age "Child age" ///
+>         c_female "Child is female" ///
+>         ravens_correct "Raven's score" ///
+>         dsf_score "Digit span forward" ///
+>         dsb_score "Digit span backward" ///
+>         math_correct "Math score" ///
+>         english_correct "English score" ///
+>         cog_index "Cognitive index" ///
+>         haz_approx "Height-for-age z-score" ///
+>         waz_approx "Weight-for-age z-score" ///
+>         m_age_harmonized "Mother's age" ///
+>         m_k10_score "K10 depression score" ///
+>         m_depressed_binary "Mother depressed (K10 $\geq$ 20)" ///
+>         m_read_hw_time "Reading/homework time" ///
+>         m_total_child_time "Total child time" ///
+>         hh_size "Household size" ///
+>         ln_pc_consumption "Log per capita consumption" ///
+>     ) ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table3_SummaryByWave.tex)
+
+. 
+. /* Text output */
+. cap noi esttab wave1 wave2 wave3 using "$results/Table3_SummaryByWave.txt", r
+> eplace ///
+>     cells("mean(fmt(%9.3f)) sd(par fmt(%9.3f)) count(fmt(%9.0f))") ///
+>     noobs nonumber ///
+>     mtitles("Wave 1 (2009)" "Wave 2 (2012)" "Wave 3 (2018)") ///
+>     title("Summary Statistics by Survey Wave") ///
+>     coeflabels( ///
+>         c_age "Child age" ///
+>         c_female "Child is female" ///
+>         ravens_correct "Raven's score" ///
+>         dsf_score "Digit span forward" ///
+>         dsb_score "Digit span backward" ///
+>         math_correct "Math score" ///
+>         english_correct "English score" ///
+>         cog_index "Cognitive index" ///
+>         haz_approx "Height-for-age z-score" ///
+>         waz_approx "Weight-for-age z-score" ///
+>         m_age_harmonized "Mother's age" ///
+>         m_k10_score "K10 depression score" ///
+>         m_depressed_binary "Mother depressed (K10 >= 20)" ///
+>         m_read_hw_time "Reading/homework time" ///
+>         m_total_child_time "Total child time" ///
+>         hh_size "Household size" ///
+>         ln_pc_consumption "Log per capita consumption" ///
+>     )
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table3_SummaryByWave.txt)
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 4: DEPRESSION DISTRIBUTION
+> =============================================================================
+> =*/
+. 
+. /* Depression severity distribution */
+. tab m_depression_cat wave, col
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+           |   Survey Wave (1=2009, 2=2012,
+m_depressi |             3=2018)
+    on_cat |         1          2          3 |     Total
+-----------+---------------------------------+----------
+         0 |     2,212      3,117      2,618 |     7,947 
+           |     44.00      69.14      62.36 |     57.87 
+-----------+---------------------------------+----------
+         1 |     1,457        898        857 |     3,212 
+           |     28.98      19.92      20.41 |     23.39 
+-----------+---------------------------------+----------
+         2 |       912        357        497 |     1,766 
+           |     18.14       7.92      11.84 |     12.86 
+-----------+---------------------------------+----------
+         3 |       446        136        226 |       808 
+           |      8.87       3.02       5.38 |      5.88 
+-----------+---------------------------------+----------
+     Total |     5,027      4,508      4,198 |    13,733 
+           |    100.00     100.00     100.00 |    100.00 
+
+. 
+. /* Export depression distribution table */
+. eststo clear
+
+. estpost tabulate m_depression_cat wave, nototal
+
+wave         |                                            
+m_depression |      e(b)     e(pct)  e(colpct)  e(rowpct) 
+-------------+--------------------------------------------
+1            |                                            
+           0 |      2212   16.10719   44.00239    27.8344 
+           1 |      1457   10.60948   28.98349   45.36115 
+           2 |       912   6.640938   18.14203   51.64213 
+           3 |       446   3.247652   8.872091   55.19802 
+-------------+--------------------------------------------
+2            |                                            
+           0 |      3117   22.69715   69.14374   39.22235 
+           1 |       898   6.538994   19.92014   27.95766 
+           2 |       357   2.599578   7.919255   20.21518 
+           3 |       136   .9903153   3.016859   16.83168 
+-------------+--------------------------------------------
+3            |                                            
+           0 |      2618   19.06357   62.36303   32.94325 
+           1 |       857   6.240443   20.41448    26.6812 
+           2 |       497    3.61902   11.83897    28.1427 
+           3 |       226   1.645671   5.383516    27.9703 
+
+. cap noi esttab using "$results/Table4_DepressionDistribution.tex", replace //
+> /
+>     cells("b(fmt(%9.0f)) colpct(fmt(%9.1f) par)") ///
+>     nonumber noobs ///
+>     title("Distribution of Maternal Depression Severity by Wave") ///
+>     addnotes("K10 categories: Low (10--19), Mild (20--24), Moderate (25--29),
+>  Severe (30--50).") ///
+>     collabels("N" "\%") ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table4_DepressionDistribution.tex)
+
+. 
+. /* Text output */
+. estpost tabulate m_depression_cat wave, nototal
+
+wave         |                                            
+m_depression |      e(b)     e(pct)  e(colpct)  e(rowpct) 
+-------------+--------------------------------------------
+1            |                                            
+           0 |      2212   16.10719   44.00239    27.8344 
+           1 |      1457   10.60948   28.98349   45.36115 
+           2 |       912   6.640938   18.14203   51.64213 
+           3 |       446   3.247652   8.872091   55.19802 
+-------------+--------------------------------------------
+2            |                                            
+           0 |      3117   22.69715   69.14374   39.22235 
+           1 |       898   6.538994   19.92014   27.95766 
+           2 |       357   2.599578   7.919255   20.21518 
+           3 |       136   .9903153   3.016859   16.83168 
+-------------+--------------------------------------------
+3            |                                            
+           0 |      2618   19.06357   62.36303   32.94325 
+           1 |       857   6.240443   20.41448    26.6812 
+           2 |       497    3.61902   11.83897    28.1427 
+           3 |       226   1.645671   5.383516    27.9703 
+
+. cap noi esttab using "$results/Table4_DepressionDistribution.txt", replace //
+> /
+>     cells("b(fmt(%9.0f)) colpct(fmt(%9.1f) par)") ///
+>     nonumber noobs ///
+>     title("Distribution of Maternal Depression Severity by Wave")
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table4_DepressionDistribution.txt)
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE 5: CORRELATION MATRIX - KEY VARIABLES
+> =============================================================================
+> =*/
+. 
+. /* Correlation between depression and cognitive outcomes */
+. /* Note: dsf_score and dsb_score may be all-missing in analysis sample; exclu
+> de if so */
+. correlate m_k10_score cog_index ravens_correct ///
+>     math_correct english_correct haz_approx m_read_hw_time ///
+>     m_total_child_time ln_pc_consumption if analysis_sample == 1
+(obs=2,422)
+
+             | m_k10_~e cog_in~x ravens~t math_c~t englis~t haz_ap~x m_read~e
+-------------+---------------------------------------------------------------
+ m_k10_score |   1.0000
+   cog_index |   0.0153   1.0000
+ravens_cor~t |   0.0108   0.7568   1.0000
+math_correct |   0.0719   0.4240   0.0336   1.0000
+english_co~t |   0.0900   0.4340   0.0355   0.9011   1.0000
+  haz_approx |  -0.0274   0.0626   0.0013  -0.0145  -0.0075   1.0000
+m_read_hw_~e |   0.1342   0.0164   0.0309   0.1784   0.1949  -0.0859   1.0000
+m_total_ch~e |   0.1494   0.0201   0.0408   0.1362   0.1569  -0.0802   0.7441
+ln_pc_cons~n |   0.0028   0.0028  -0.0048   0.1587   0.1592  -0.0061   0.0772
+
+             | m_tota.. ln_pc_~n
+-------------+------------------
+m_total_ch~e |   1.0000
+ln_pc_cons~n |   0.0971   1.0000
+
+
+. 
+. /* Export correlation matrix */
+. estpost correlate m_k10_score cog_index ravens_correct ///
+>     math_correct english_correct haz_approx m_read_hw_time ///
+>     m_total_child_time ln_pc_consumption if analysis_sample == 1, ///
+>     matrix listwise
+
+             |      e(b)     e(rho)       e(p)   e(count) 
+-------------+--------------------------------------------
+m_k10_score  |                                            
+ m_k10_score |         1          1                  2422 
+   cog_index |  .0152552   .0152552   .4529993       2422 
+ravens_cor~t |  .0108184   .0108184   .5946189       2422 
+math_correct |  .0719086   .0719086   .0003976       2422 
+english_co~t |  .0899878   .0899878   9.19e-06       2422 
+  haz_approx | -.0273904  -.0273904   .1778051       2422 
+m_read_hw_~e |  .1342393   .1342393   3.29e-11       2422 
+m_total_ch~e |  .1494291   .1494291   1.45e-13       2422 
+ln_pc_cons~n |  .0027524   .0027524   .8923082       2422 
+cog_index    |                                            
+   cog_index |         1          1                  2422 
+ravens_cor~t |   .756806    .756806          0       2422 
+math_correct |  .4240138   .4240138   2.7e-106       2422 
+english_co~t |  .4339603   .4339603   8.4e-112       2422 
+  haz_approx |  .0626104   .0626104   .0020511       2422 
+m_read_hw_~e |  .0164415   .0164415   .4186383       2422 
+m_total_ch~e |  .0200558   .0200558   .3238335       2422 
+ln_pc_cons~n |  .0028191   .0028191   .8897123       2422 
+ravens_cor~t |                                            
+ravens_cor~t |         1          1                  2422 
+math_correct |  .0336329   .0336329   .0979618       2422 
+english_co~t |  .0355155   .0355155   .0805504       2422 
+  haz_approx |  .0012885   .0012885   .9494638       2422 
+m_read_hw_~e |  .0309105   .0309105     .12831       2422 
+m_total_ch~e |  .0408482   .0408482   .0444209       2422 
+ln_pc_cons~n | -.0047875  -.0047875   .8138285       2422 
+math_correct |                                            
+math_correct |         1          1                  2422 
+english_co~t |  .9011473   .9011473          0       2422 
+  haz_approx | -.0145163  -.0145163   .4751818       2422 
+m_read_hw_~e |  .1783832   .1783832   9.12e-19       2422 
+m_total_ch~e |    .13619     .13619   1.69e-11       2422 
+ln_pc_cons~n |  .1587342   .1587342   3.91e-15       2422 
+english_co~t |                                            
+english_co~t |         1          1                  2422 
+  haz_approx | -.0074783  -.0074783   .7129846       2422 
+m_read_hw_~e |  .1948824   .1948824   3.71e-22       2422 
+m_total_ch~e |  .1569037   .1569037   8.10e-15       2422 
+ln_pc_cons~n |  .1592016   .1592016   3.24e-15       2422 
+haz_approx   |                                            
+  haz_approx |         1          1                  2422 
+m_read_hw_~e | -.0859219  -.0859219   .0000229       2422 
+m_total_ch~e | -.0802248  -.0802248   .0000773       2422 
+ln_pc_cons~n | -.0060526  -.0060526    .765918       2422 
+m_read_hw_~e |                                            
+m_read_hw_~e |         1          1                  2422 
+m_total_ch~e |   .744101    .744101          0       2422 
+ln_pc_cons~n |  .0772184   .0772184   .0001424       2422 
+m_total_ch~e |                                            
+m_total_ch~e |         1          1                  2422 
+ln_pc_cons~n |  .0971343   .0971343   1.67e-06       2422 
+ln_pc_cons~n |                                            
+ln_pc_cons~n |         1          1                  2422 
+
+. 
+. cap noi esttab using "$results/Table5_Correlations.tex", replace ///
+>     unstack not noobs compress nonumber ///
+>     title("Correlation Matrix: Key Variables") ///
+>     coeflabels( ///
+>         m_k10_score "K10 Depression" ///
+>         cog_index "Cognitive Index" ///
+>         ravens_correct "Raven's" ///
+>         math_correct "Math" ///
+>         english_correct "English" ///
+>         haz_approx "HAZ" ///
+>         m_read_hw_time "Read/HW Time" ///
+>         m_total_child_time "Total Child Time" ///
+>         ln_pc_consumption "Ln(PC Consump.)" ///
+>     ) ///
+>     addnotes("Source: GSPS analysis sample." ///
+>              "*** p$<$0.01, ** p$<$0.05, * p$<$0.1") ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     b(%9.3f) ///
+>     booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table5_Correlations.tex)
+
+. 
+. cap noi esttab using "$results/Table5_Correlations.txt", replace ///
+>     unstack not noobs compress nonumber ///
+>     title("Correlation Matrix: Key Variables") ///
+>     star(* 0.10 ** 0.05 *** 0.01) ///
+>     b(%9.3f)
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026/Table5_Correlations.txt)
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     EXCEL OUTPUT: ALL SUMMARY STATISTICS
+> =============================================================================
+> =*/
+. 
+. /* Export to Excel using putexcel */
+. putexcel set "$results/SummaryStatistics.xlsx", sheet("Table1_Full") replace
+note: file will be replaced when the first putexcel command is issued.
+
+. 
+. /* Header */
+. putexcel A1 = "Table 1: Summary Statistics — Full Analysis Sample"
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+
+. putexcel A2 = "Variable" B2 = "N" C2 = "Mean" D2 = "Std. Dev." E2 = "Min" F2 
+> = "Max"
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+
+. 
+. /* Child variables */
+. local row = 3
+
+. putexcel A`row' = "Panel A: Child Characteristics"
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+
+. local row = `row' + 1
+
+. 
+. foreach var in c_age c_female ravens_correct dsf_score dsb_score ///
+>     math_correct english_correct cog_index haz_approx waz_approx {
+  2. 
+.     qui summarize `var'
+  3.     local lab: variable label `var'
+  4.     if "`lab'" == "" local lab "`var'"
+  5. 
+.     putexcel A`row' = "`lab'"
+  6.     putexcel B`row' = (r(N)), nformat(#,##0)
+  7.     putexcel C`row' = (r(mean)), nformat(0.000)
+  8.     putexcel D`row' = (r(sd)), nformat(0.000)
+  9.     putexcel E`row' = (r(min)), nformat(0.000)
+ 10.     putexcel F`row' = (r(max)), nformat(0.000)
+ 11.     local row = `row' + 1
+ 12. }
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+
+. 
+. /* Maternal variables */
+. putexcel A`row' = "Panel B: Maternal Characteristics"
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+
+. local row = `row' + 1
+
+. 
+. foreach var in m_age_harmonized m_k10_score m_depressed_binary ///
+>     m_mother_educ_years m_weekly_hours ///
+>     m_read_hw_time m_total_child_time m_careforkids_yn {
+  2. 
+.     qui summarize `var'
+  3.     local lab: variable label `var'
+  4.     if "`lab'" == "" local lab "`var'"
+  5. 
+.     putexcel A`row' = "`lab'"
+  6.     putexcel B`row' = (r(N)), nformat(#,##0)
+  7.     putexcel C`row' = (r(mean)), nformat(0.000)
+  8.     putexcel D`row' = (r(sd)), nformat(0.000)
+  9.     putexcel E`row' = (r(min)), nformat(0.000)
+ 10.     putexcel F`row' = (r(max)), nformat(0.000)
+ 11.     local row = `row' + 1
+ 12. }
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+
+. 
+. /* Household variables */
+. putexcel A`row' = "Panel C: Household Characteristics"
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+
+. local row = `row' + 1
+
+. 
+. foreach var in hh_size ln_pc_consumption {
+  2.     qui summarize `var'
+  3.     local lab: variable label `var'
+  4.     if "`lab'" == "" local lab "`var'"
+  5. 
+.     putexcel A`row' = "`lab'"
+  6.     putexcel B`row' = (r(N)), nformat(#,##0)
+  7.     putexcel C`row' = (r(mean)), nformat(0.000)
+  8.     putexcel D`row' = (r(sd)), nformat(0.000)
+  9.     putexcel E`row' = (r(min)), nformat(0.000)
+ 10.     putexcel F`row' = (r(max)), nformat(0.000)
+ 11.     local row = `row' + 1
+ 12. }
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+file /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Heal
+> th/Ghana_mental_health/maternal_depression_child_cog_devlopment/rersults/Draf
+> t1_Feb2026/SummaryStatistics.xlsx saved
+
+. 
+. putexcel save
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     ATTRITION TABLE
+> =============================================================================
+> =*/
+. 
+. /* Check attrition across waves */
+. use "$programs/analysis_data.dta", clear
+
+. 
+. /* Presence in each wave */
+. bysort person_id: gen in_w1 = (wave == 1)
+
+. bysort person_id: gen in_w2 = (wave == 2)
+
+. bysort person_id: gen in_w3 = (wave == 3)
+
+. 
+. bysort person_id: egen present_w1 = max(in_w1)
+
+. bysort person_id: egen present_w2 = max(in_w2)
+
+. bysort person_id: egen present_w3 = max(in_w3)
+
+. 
+. bysort person_id: egen n_waves = total(1)
+
+. 
+. /* Keep one observation per person */
+. bysort person_id: keep if _n == 1
+(8,802 observations deleted)
+
+. 
+. di _n "=============================================="
+
+==============================================
+
+. di "PANEL ATTRITION"
+PANEL ATTRITION
+
+. di "=============================================="
+==============================================
+
+. tab present_w1 present_w2
+
+           |      present_w2
+present_w1 |         0          1 |     Total
+-----------+----------------------+----------
+         0 |     3,119      2,641 |     5,760 
+         1 |     3,936      4,439 |     8,375 
+-----------+----------------------+----------
+     Total |     7,055      7,080 |    14,135 
+
+. tab present_w2 present_w3
+
+           |      present_w3
+present_w2 |         0          1 |     Total
+-----------+----------------------+----------
+         0 |     3,568      3,487 |     7,055 
+         1 |     3,085      3,995 |     7,080 
+-----------+----------------------+----------
+     Total |     6,653      7,482 |    14,135 
+
+. tab n_waves
+
+    n_waves |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |      7,771       54.98       54.98
+          2 |      3,926       27.78       82.75
+          3 |      2,438       17.25      100.00
+------------+-----------------------------------
+      Total |     14,135      100.00
+
+. 
+. /* Attrition probit: does Wave 1 depression predict attrition? */
+. gen attrit_w2 = (present_w1 == 1 & present_w2 == 0)
+
+. gen attrit_w3 = (present_w2 == 1 & present_w3 == 0)
+
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers
+> /OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment/progr
+> ams/stata/Draft1_Feb2026/01_summary_stats.log
+  log type:  text
+ closed on:  21 Feb 2026, 21:07:13
+-------------------------------------------------------------------------------

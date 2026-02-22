@@ -1,0 +1,23 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Correlation Matrix: Key Variables}
+\begin{tabular}{l*{9}{c}}
+\toprule
+          &\multicolumn{9}{c}{}                                                                                                                                                      \\
+          &m\_k10\_score         &cog\_index         &ravens\_correct         &math\_correct         &english\_correct         &haz\_approx         &m\_read\_hw\_time         &m\_total\_child\_time         &ln\_pc\_consumption         \\
+\midrule
+K10 Depression&    1.000         &                  &                  &                  &                  &                  &                  &                  &                  \\
+Cognitive Index&    0.015         &    1.000         &                  &                  &                  &                  &                  &                  &                  \\
+Raven's   &    0.011         &    0.757\sym{***}&    1.000         &                  &                  &                  &                  &                  &                  \\
+Math      &    0.072\sym{***}&    0.424\sym{***}&    0.034\sym{*}  &    1.000         &                  &                  &                  &                  &                  \\
+English   &    0.090\sym{***}&    0.434\sym{***}&    0.036\sym{*}  &    0.901\sym{***}&    1.000         &                  &                  &                  &                  \\
+HAZ       &   -0.027         &    0.063\sym{***}&    0.001         &   -0.015         &   -0.007         &    1.000         &                  &                  &                  \\
+Read/HW Time&    0.134\sym{***}&    0.016         &    0.031         &    0.178\sym{***}&    0.195\sym{***}&   -0.086\sym{***}&    1.000         &                  &                  \\
+Total Child Time&    0.149\sym{***}&    0.020         &    0.041\sym{**} &    0.136\sym{***}&    0.157\sym{***}&   -0.080\sym{***}&    0.744\sym{***}&    1.000         &                  \\
+Ln(PC Consump.)&    0.003         &    0.003         &   -0.005         &    0.159\sym{***}&    0.159\sym{***}&   -0.006         &    0.077\sym{***}&    0.097\sym{***}&    1.000         \\
+\bottomrule
+\multicolumn{10}{l}{\footnotesize Source: GSPS analysis sample.}\\
+\multicolumn{10}{l}{\footnotesize *** p$<$0.01, ** p$<$0.05, * p$<$0.1}\\
+\multicolumn{10}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}
