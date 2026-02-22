@@ -30,7 +30,7 @@ The repository also includes a **prenatal depression analysis** that identifies 
 - Preferred EA FE specification: 11,958 observations (334 EAs)
 - Prenatal depression sample: 724 observations (150 EAs)
 
-**Note:** The raw GSPS data files are not included in this repository. The data can be obtained from the [Yale Economic Growth Center](https://egc.yale.edu/).
+**Note:** The raw GSPS data files are excluded from the repository via `.gitignore`. The data can be obtained from the [Yale Economic Growth Center](https://egc.yale.edu/) and should be placed in the `data/` directory.
 
 ## Key Variables
 
@@ -47,45 +47,51 @@ The repository also includes a **prenatal depression analysis** that identifies 
 ```
 .
 ├── README.md
+├── .gitignore
 ├── programs/stata/
-│   ├── main_estimation/           # Concurrent depression analysis
-│   │   ├── master.do              # Pipeline runner (defines paths, runs all do files)
-│   │   ├── install_packages.do    # Installs required Stata packages
-│   │   ├── 00_data_cleaning.do    # Merges GSPS waves, constructs all variables
-│   │   ├── 01_summary_stats.do    # Summary statistics (Tables 1-5)
-│   │   ├── 02_main_estimation.do  # Main results: OLS, EA FE, child FE (Tables 6-12)
+│   ├── Draft1_Feb2026/                # Concurrent depression analysis
+│   │   ├── master.do                  # Pipeline runner (defines paths, runs all do files)
+│   │   ├── install_packages.do        # Installs required Stata packages
+│   │   ├── 00_data_cleaning.do        # Merges GSPS waves, constructs all variables
+│   │   ├── 01_summary_stats.do        # Summary statistics (Tables 1-5)
+│   │   ├── 02_main_estimation.do      # Main results: OLS, EA FE, child FE (Tables 6-12)
 │   │   ├── 02b_revised_estimation.do  # Revised full-sample EA FE specifications
-│   │   ├── 03_mechanisms.do       # Channel analysis: time, financial, nutrition, health (Tables 13-18)
-│   │   ├── 04_robustness.do       # Robustness checks (Tables A1-A9)
-│   │   └── *.log                  # Stata log files
-│   └── prenatal_depression/       # Prenatal depression analysis
-│       ├── 03_prenatal_depression.do  # Prenatal identification & estimation (Tables P1-P2)
+│   │   ├── 03_mechanisms.do           # Channel analysis: time, financial, nutrition, health (Tables 13-18)
+│   │   ├── 04_robustness.do           # Robustness checks (Tables A1-A9)
+│   │   └── *.log                      # Stata log files
+│   └── Draft1_Feb2026_MH_Pregnancy/   # Prenatal depression analysis
+│       ├── 03_prenatal_depression.do   # Prenatal identification & estimation (Tables P1-P2)
 │       └── 03_prenatal_depression.log
-├── results/
-│   ├── main_estimation/           # 27 tables in LaTeX (.tex) and text (.txt) formats
-│   │   ├── All_Tables.pdf         # Compiled PDF of all tables
-│   │   ├── All_Tables.tex         # LaTeX master document
+├── rersults/
+│   ├── Draft1_Feb2026/                # 27 tables in LaTeX (.tex), text (.txt), and CSV formats
+│   │   ├── All_Tables.pdf             # Compiled PDF of all tables
+│   │   ├── All_Tables.tex             # LaTeX master document
+│   │   ├── SummaryStatistics.xlsx     # Summary statistics spreadsheet
 │   │   ├── Table1_SummaryStats.*
 │   │   ├── Table2_BalanceByDepression.*
 │   │   ├── ...
 │   │   └── TableA9_RobClustering.*
-│   └── prenatal_depression/       # Prenatal analysis tables and summary
+│   └── Draft1_Feb2026_MH_Pregnancy/   # Prenatal analysis tables and summary
 │       ├── All_Tables.pdf
 │       ├── All_Tables.tex
-│       ├── Results_Summary.pdf    # Full narrative summary of prenatal analysis
+│       ├── Results_Summary.pdf        # Full narrative summary of prenatal analysis
 │       ├── Results_Summary.tex
 │       ├── TableP1_PrenatalDepression.*
 │       └── TableP2_PrenatalSensitivity.*
-├── draft/
-│   ├── Results_Summary.pdf        # Full narrative summary of main analysis
-│   └── Results_Summary.tex
-└── references/                    # Key literature
+├── Draft/Draft1_Feb2026/
+│   ├── Results_Summary.pdf            # Full narrative summary of main analysis
+│   ├── Results_Summary.tex
+│   └── Results_Summary_Prenatal_Depression.pdf
+├── data/                              # Raw GSPS data (excluded from git via .gitignore)
+└── references/                        # Key literature
     ├── baranov-et-al-2020-maternal-depression-womens-empowerment-...pdf
     ├── JHR_2016_Anna_Aizer.pdf
     ├── JHR_2020.pdf
     ├── NBER 2016.pdf
     └── persson-rossin-slater-2018-family-ruptures-stress-...pdf
 ```
+
+**Note:** The `data/` directory containing raw GSPS data files and `*.dta` intermediate data files are excluded from the repository via `.gitignore`.
 
 ## Results Tables
 
@@ -144,14 +150,16 @@ The repository also includes a **prenatal depression analysis** that identifies 
 
 ## How to Run
 
-1. Obtain the GSPS data and place it in the appropriate directory
-2. Edit the file paths in `master.do` to match your local setup
+1. Obtain the GSPS data and place it in the `data/` directory
+2. Edit the file paths in `programs/stata/Draft1_Feb2026/master.do` to match your local setup
 3. Run `master.do` to execute the full pipeline:
    ```
+   cd programs/stata/Draft1_Feb2026
    stata-se -b -e master.do
    ```
 4. For the prenatal analysis, run separately:
    ```
+   cd programs/stata/Draft1_Feb2026_MH_Pregnancy
    stata-se -b -e 03_prenatal_depression.do
    ```
 
