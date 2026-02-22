@@ -1,0 +1,79 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      StataNow 19.5
+___/   /   /___/   /   /___/       SE—Standard Edition
+
+ Statistics and Data Science       Copyright 1985-2025 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: Unlimited-user network, expiring  9 May 2026
+Serial number: 401909305345
+  Licensed to: Ghosh, Pallab K.
+               University of Oklahoma
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+. do install_packages.do sleep 45 cat install_packages.log 
+
+. /* Install required packages */
+. cap ssc install require, replace
+
+. cap ssc install ftools, replace
+
+. cap ssc install reghdfe, replace
+
+. cap ftools, compile
+
+. cap ssc install estout, replace
+
+. cap ssc install outreg2, replace
+
+. cap ssc install ivreg2, replace
+
+. cap ssc install ranktest, replace
+
+. cap ssc install ivreghdfe, replace
+
+. 
+. /* Quick test that reghdfe works */
+. sysuse auto, clear
+(1978 automobile data)
+
+. reghdfe price mpg, absorb(foreign)
+(MWFE estimator converged in 1 iterations)
+
+HDFE Linear regression                            Number of obs   =         74
+Absorbing 1 HDFE group                            F(   1,     71) =      27.91
+                                                  Prob > F        =     0.0000
+                                                  R-squared       =     0.2838
+                                                  Adj R-squared   =     0.2637
+                                                  Within R-sq.    =     0.2821
+                                                  Root MSE        =  2530.9456
+
+------------------------------------------------------------------------------
+       price | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         mpg |  -294.1955   55.69172    -5.28   0.000    -405.2417   -183.1494
+       _cons |   12430.83    1222.03    10.17   0.000     9994.169    14867.48
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+     foreign |         2           0           2     |
+-----------------------------------------------------+
+
+. di "reghdfe test passed"
+reghdfe test passed
+
+. 
+end of do-file

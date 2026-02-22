@@ -1,0 +1,17 @@
+# Raw data (too large for GitHub)
+data/
+
+# Stata data files (intermediate/temp)
+*.dta
+
+# Stata temp folders
+temp/
+
+# macOS
+.DS_Store
+
+# LaTeX auxiliary files
+*.aux
+*.out
+*.toc
+*.synctex.gz
