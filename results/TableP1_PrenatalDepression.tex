@@ -1,0 +1,31 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Effect of Prenatal Depression on Child Cognitive Development}
+\begin{tabular}{l*{5}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+            &\multicolumn{1}{c}{OLS}&\multicolumn{1}{c}{OLS}&\multicolumn{1}{c}{EA FE}&\multicolumn{1}{c}{EA FE}&\multicolumn{1}{c}{EA FE}\\
+\midrule
+Prenatal depression (std. K10)&      -0.007         &      -0.009         &      -0.002         &                     &      -0.027         \\
+            &     (0.042)         &     (0.038)         &     (0.052)         &                     &     (0.057)         \\
+\addlinespace
+Prenatally depressed (K10 $\geq$ 30)&                     &                     &                     &       0.184         &                     \\
+            &                     &                     &                     &     (0.263)         &                     \\
+\addlinespace
+Concurrent depression (std. K10)&                     &                     &                     &                     &       0.035         \\
+            &                     &                     &                     &                     &     (0.053)         \\
+\midrule
+Controls    &          No         &         Yes         &         Yes         &         Yes         &         Yes         \\
+EA FE       &          No         &          No         &         Yes         &         Yes         &         Yes         \\
+Wave FE     &          No         &          No         &         Yes         &         Yes         &         Yes         \\
+Observations&         779         &         779         &         724         &         724         &         724         \\
+$R^2$       &       0.000         &       0.071         &       0.297         &       0.298         &       0.297         \\
+\bottomrule
+\multicolumn{6}{l}{\footnotesize Standard errors clustered at the EA level in parentheses.}\\
+\multicolumn{6}{l}{\footnotesize Prenatal depression identified via (A) pregnancy at interview and}\\
+\multicolumn{6}{l}{\footnotesize (B) birth timing (child born 0--9 months after previous wave interview).}\\
+\multicolumn{6}{l}{\footnotesize Controls: child age, child gender, mother's age,}\\
+\multicolumn{6}{l}{\footnotesize household size, and log per capita consumption.}\\
+\multicolumn{6}{l}{\footnotesize *** p$<$0.01, ** p$<$0.05, * p$<$0.1}\\
+\end{tabular}
+\end{table}

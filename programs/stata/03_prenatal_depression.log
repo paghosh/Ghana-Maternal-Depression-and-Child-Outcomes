@@ -1,0 +1,2515 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers
+> /OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment/progr
+> ams/stata/Draft1_Feb2026_MH_Pregnancy/03_prenatal_depression.log
+  log type:  text
+ opened on:  22 Feb 2026, 10:30:59
+
+. 
+. /* Install required packages */
+. cap ssc install estout, replace
+
+. cap ssc install reghdfe, replace
+
+. cap ssc install ftools, replace
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     PART 1: EXTRACT PREGNANCY STATUS FROM FERTILITY FILES
+> =============================================================================
+> =*/
+. 
+. di _n(3) "=============================================="
+
+
+
+==============================================
+
+. di "PART 1: Extracting pregnancy status"
+PART 1: Extracting pregnancy status
+
+. di "=============================================="
+==============================================
+
+. 
+. /*--- Wave 1: s7a.dta ---*/
+. use "$data/Wave 1/s7a.dta", clear
+
+. 
+. /* s7a_24 = pregnant now, s7a_25 = pregnant last year
+>    These are numeric with value labels (1=Yes, 2=No typically) */
+. cap confirm string variable s7a_24
+
+. if _rc == 0 {
+.     gen pregnant_now = (s7a_24 == "Yes") if !missing(s7a_24)
+. }
+
+. else {
+.     decode s7a_24, gen(_tmp_pn)
+.     gen pregnant_now = (upper(strtrim(_tmp_pn)) == "YES") if !missing(s7a_24)
+(1,825 missing values generated)
+.     drop _tmp_pn
+. }
+
+. 
+. cap confirm string variable s7a_25
+
+. if _rc == 0 {
+.     gen pregnant_last_year = (s7a_25 == "Yes") if !missing(s7a_25)
+. }
+
+. else {
+.     decode s7a_25, gen(_tmp_ply)
+.     gen pregnant_last_year = (upper(strtrim(_tmp_ply)) == "YES") if !missing(
+> s7a_25)
+(2,045 missing values generated)
+.     drop _tmp_ply
+. }
+
+. 
+. /* FPrimary is int32 in Wave 1 — convert to string */
+. cap confirm string variable FPrimary
+
+. if _rc != 0 {
+.     tostring FPrimary, replace force
+FPrimary was long now str9
+. }
+
+. 
+. rename hhmid mother_hhmid
+
+. cap drop wave
+
+. gen wave = 1
+
+. keep FPrimary mother_hhmid wave pregnant_now pregnant_last_year
+
+. duplicates drop FPrimary mother_hhmid, force
+
+Duplicates in terms of FPrimary mother_hhmid
+
+(0 observations are duplicates)
+
+. 
+. di "Wave 1 pregnancy:"
+Wave 1 pregnancy:
+
+. tab pregnant_now, m
+
+pregnant_no |
+          w |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      4,377       67.89       67.89
+          1 |        245        3.80       71.69
+          . |      1,825       28.31      100.00
+------------+-----------------------------------
+      Total |      6,447      100.00
+
+. tab pregnant_last_year, m
+
+pregnant_la |
+    st_year |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      3,915       60.73       60.73
+          1 |        487        7.55       68.28
+          . |      2,045       31.72      100.00
+------------+-----------------------------------
+      Total |      6,447      100.00
+
+. 
+. save "$temp/w1_pregnancy.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w1_pregnancy.dta not found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w1_pregnancy.dta saved
+
+. 
+. 
+. /*--- Wave 2: 07a_fertility.dta ---*/
+. use "$data/Wave 2/07a_fertility.dta", clear
+(b07a_fertility)
+
+. 
+. /* pregnantnow, pregnantlastyear — numeric with value labels */
+. cap confirm string variable pregnantnow
+
+. if _rc == 0 {
+.     gen pregnant_now = (pregnantnow == "Yes") if !missing(pregnantnow)
+. }
+
+. else {
+.     decode pregnantnow, gen(_tmp_pn)
+.     gen pregnant_now = (upper(strtrim(_tmp_pn)) == "YES") if !missing(pregnan
+> tnow)
+(2,010 missing values generated)
+.     drop _tmp_pn
+. }
+
+. 
+. cap confirm string variable pregnantlastyear
+
+. if _rc == 0 {
+.     gen pregnant_last_year = (pregnantlastyear == "Yes") if !missing(pregnant
+> lastyear)
+. }
+
+. else {
+.     decode pregnantlastyear, gen(_tmp_ply)
+.     gen pregnant_last_year = (upper(strtrim(_tmp_ply)) == "YES") if !missing(
+> pregnantlastyear)
+(2,207 missing values generated)
+.     drop _tmp_ply
+. }
+
+. 
+. /* FPrimary is string in Wave 2 */
+. cap confirm string variable FPrimary
+
+. if _rc != 0 {
+.     tostring FPrimary, replace force
+. }
+
+. 
+. rename hhmid mother_hhmid
+
+. cap drop wave
+
+. gen wave = 2
+
+. keep FPrimary mother_hhmid wave pregnant_now pregnant_last_year
+
+. duplicates drop FPrimary mother_hhmid, force
+
+Duplicates in terms of FPrimary mother_hhmid
+
+(0 observations are duplicates)
+
+. 
+. di "Wave 2 pregnancy:"
+Wave 2 pregnancy:
+
+. tab pregnant_now, m
+
+pregnant_no |
+          w |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      4,012       64.60       64.60
+          1 |        189        3.04       67.64
+          . |      2,010       32.36      100.00
+------------+-----------------------------------
+      Total |      6,211      100.00
+
+. tab pregnant_last_year, m
+
+pregnant_la |
+    st_year |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      3,575       57.56       57.56
+          1 |        429        6.91       64.47
+          . |      2,207       35.53      100.00
+------------+-----------------------------------
+      Total |      6,211      100.00
+
+. 
+. save "$temp/w2_pregnancy.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w2_pregnancy.dta not found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w2_pregnancy.dta saved
+
+. 
+. 
+. /*--- Wave 3: 07a_fertility.dta ---*/
+. use "$data/Wave 3/07a_fertility.dta", clear
+
+. 
+. /* Filter to females only (Wave 3 includes males) */
+. cap confirm string variable sex
+
+. if _rc == 0 {
+.     keep if sex == "Female"
+. }
+
+. else {
+.     cap decode sex, gen(_tmp_sex)
+.     if _rc == 0 {
+.         keep if upper(strtrim(_tmp_sex)) == "FEMALE"
+.         drop _tmp_sex
+.     }
+.     else {
+.         /* Try numeric: typically 2=Female */
+.         cap keep if sex == 2
+.     }
+. }
+
+. 
+. cap confirm string variable pregnantnow
+
+. if _rc == 0 {
+.     gen pregnant_now = (pregnantnow == "Yes") if !missing(pregnantnow)
+. }
+
+. else {
+.     decode pregnantnow, gen(_tmp_pn)
+.     gen pregnant_now = (upper(strtrim(_tmp_pn)) == "YES") if !missing(pregnan
+> tnow)
+(16,114 missing values generated)
+.     drop _tmp_pn
+. }
+
+. 
+. cap confirm string variable pregnantlastyear
+
+. if _rc == 0 {
+.     gen pregnant_last_year = (pregnantlastyear == "Yes") if !missing(pregnant
+> lastyear)
+. }
+
+. else {
+.     decode pregnantlastyear, gen(_tmp_ply)
+.     gen pregnant_last_year = (upper(strtrim(_tmp_ply)) == "YES") if !missing(
+> pregnantlastyear)
+(16,354 missing values generated)
+.     drop _tmp_ply
+. }
+
+. 
+. cap confirm string variable FPrimary
+
+. if _rc != 0 {
+.     tostring FPrimary, replace force
+. }
+
+. 
+. rename hhmid mother_hhmid
+
+. cap drop wave
+
+. gen wave = 3
+
+. keep FPrimary mother_hhmid wave pregnant_now pregnant_last_year
+
+. duplicates drop FPrimary mother_hhmid, force
+
+Duplicates in terms of FPrimary mother_hhmid
+
+(0 observations are duplicates)
+
+. 
+. di "Wave 3 pregnancy:"
+Wave 3 pregnancy:
+
+. tab pregnant_now, m
+
+pregnant_no |
+          w |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      2,652       13.95       13.95
+          1 |        240        1.26       15.22
+          . |     16,114       84.78      100.00
+------------+-----------------------------------
+      Total |     19,006      100.00
+
+. tab pregnant_last_year, m
+
+pregnant_la |
+    st_year |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      2,296       12.08       12.08
+          1 |        356        1.87       13.95
+          . |     16,354       86.05      100.00
+------------+-----------------------------------
+      Total |     19,006      100.00
+
+. 
+. save "$temp/w3_pregnancy.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w3_pregnancy.dta not found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w3_pregnancy.dta saved
+
+. 
+. 
+. /*--- Append all waves ---*/
+. use "$temp/w1_pregnancy.dta", clear
+
+. append using "$temp/w2_pregnancy.dta"
+
+. append using "$temp/w3_pregnancy.dta"
+(variable FPrimary was str9, now str14 to accommodate using data's values)
+
+. 
+. save "$temp/pregnancy_panel.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/pregnancy_panel.dta not
+    found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/pregnancy_panel.dta saved
+
+. 
+. di _n "Pregnancy status panel:"
+
+Pregnancy status panel:
+
+. tab wave pregnant_now, m
+
+           |           pregnant_now
+      wave |         0          1          . |     Total
+-----------+---------------------------------+----------
+         1 |     4,377        245      1,825 |     6,447 
+         2 |     4,012        189      2,010 |     6,211 
+         3 |     2,652        240     16,114 |    19,006 
+-----------+---------------------------------+----------
+     Total |    11,041        674     19,949 |    31,664 
+
+. tab wave pregnant_last_year, m
+
+           |        pregnant_last_year
+      wave |         0          1          . |     Total
+-----------+---------------------------------+----------
+         1 |     3,915        487      2,045 |     6,447 
+         2 |     3,575        429      2,207 |     6,211 
+         3 |     2,296        356     16,354 |    19,006 
+-----------+---------------------------------+----------
+     Total |     9,786      1,272     20,606 |    31,664 
+
+. 
+. 
+. /*--- Merge pregnancy onto analysis data ---*/
+. use "$programs_main/analysis_data.dta", clear
+
+. 
+. /* Ensure FPrimary is string */
+. cap confirm string variable FPrimary
+
+. if _rc != 0 {
+.     tostring FPrimary, replace force
+. }
+
+. 
+. merge m:1 FPrimary mother_hhmid wave using "$temp/pregnancy_panel.dta", ///
+>     keep(master match) nogen
+(variable FPrimary was str10, now str14 to accommodate using data's values)
+(variable wave was byte, now float to accommodate using data's values)
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                           756
+        from master                       756  
+        from using                          0  
+
+    Matched                            22,181  
+    -----------------------------------------
+
+. 
+. /* Label */
+. label variable pregnant_now "Mother currently pregnant at interview"
+
+. label variable pregnant_last_year "Mother pregnant in last year"
+
+. 
+. di _n "Pregnancy status merged onto analysis data:"
+
+Pregnancy status merged onto analysis data:
+
+. tab wave pregnant_now if analysis_sample == 1, m
+
+    Survey |
+      Wave |
+  (1=2009, |   Mother currently pregnant at
+   2=2012, |            interview
+   3=2018) |         0          1          . |     Total
+-----------+---------------------------------+----------
+         1 |     4,675        248        115 |     5,038 
+         2 |     3,508        266        734 |     4,508 
+         3 |     2,729        170      1,301 |     4,200 
+-----------+---------------------------------+----------
+     Total |    10,912        684      2,150 |    13,746 
+
+. tab wave pregnant_last_year if analysis_sample == 1, m
+
+    Survey |
+      Wave |
+  (1=2009, |
+   2=2012, |   Mother pregnant in last year
+   3=2018) |         0          1          . |     Total
+-----------+---------------------------------+----------
+         1 |     4,178        525        335 |     5,038 
+         2 |     3,016        483      1,009 |     4,508 
+         3 |     2,428        301      1,471 |     4,200 
+-----------+---------------------------------+----------
+     Total |     9,622      1,309      2,815 |    13,746 
+
+. 
+. /* Strategy A: Prenatal depression = mother's K10 when she was pregnant */
+. gen prenatal_k10_A = m_k10_score if pregnant_now == 1
+(21,878 missing values generated)
+
+. gen prenatal_depressed_A = (m_k10_score >= 30) if pregnant_now == 1 & !missin
+> g(m_k10_score)
+(21,878 missing values generated)
+
+. label variable prenatal_k10_A "Prenatal K10 (Strategy A: pregnant at intervie
+> w)"
+
+. label variable prenatal_depressed_A "Prenatal depressed (Strategy A: pregnant
+>  at interview)"
+
+. 
+. di _n "Strategy A: Mothers with K10 measured while pregnant:"
+
+Strategy A: Mothers with K10 measured while pregnant:
+
+. count if !missing(prenatal_k10_A)
+  1,059
+
+. tab wave if !missing(prenatal_k10_A)
+
+Survey Wave |
+   (1=2009, |
+    2=2012, |
+    3=2018) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        405       38.24       38.24
+          2 |        400       37.77       76.02
+          3 |        254       23.98      100.00
+------------+-----------------------------------
+      Total |      1,059      100.00
+
+. 
+. save "$temp/analysis_prenatal_step1.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/analysis_prenatal_step1.dta
+    not found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/analysis_prenatal_step1.dta
+    saved
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     PART 2: CONSTRUCT PRENATAL DEPRESSION VIA BIRTH TIMING (STRATEGY B)
+> =============================================================================
+> =*/
+. 
+. di _n(3) "=============================================="
+
+
+
+==============================================
+
+. di "PART 2: Birth-timing strategy for prenatal depression"
+PART 2: Birth-timing strategy for prenatal depression
+
+. di "=============================================="
+==============================================
+
+. 
+. /*--- Step 2a: Get interview dates per household-wave ---*/
+. 
+. /* Wave 1 interview dates: sec0.dta */
+. use "$data/Wave 1/sec0.dta", clear
+
+. 
+. /* day, month, year are integer columns */
+. gen interview_date_w1 = mdy(month, day, year)
+
+. format interview_date_w1 %td
+
+. 
+. cap confirm string variable FPrimary
+
+. if _rc != 0 {
+.     tostring FPrimary, replace force
+FPrimary was long now str9
+. }
+
+. 
+. keep FPrimary interview_date_w1
+
+. duplicates drop FPrimary, force
+
+Duplicates in terms of FPrimary
+
+(0 observations are duplicates)
+
+. 
+. di "Wave 1 interview dates:"
+Wave 1 interview dates:
+
+. sum interview_date_w1
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+interview_~1 |      5,009    18285.29    36.41816      18228      18358
+
+. di "Range: " %td r(min) " to " %td r(max)
+Range: 27nov2009 to 06apr2010
+
+. 
+. save "$temp/w1_interview_date.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w1_interview_date.dta not
+    found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w1_interview_date.dta saved
+
+. 
+. 
+. /* Wave 2 interview dates: 01b2_roster.dta — use checkdate */
+. use "$data/Wave 2/01b2_roster.dta", clear
+(bb01b2_roster)
+
+. 
+. /* checkdate is stored as int with %td format (already a Stata date) */
+. cap confirm numeric variable checkdate
+
+. if _rc == 0 {
+.     gen interview_date_w2 = checkdate
+.     format interview_date_w2 %td
+. }
+
+. else {
+.     gen interview_date_w2 = date(checkdate, "DMY")
+.     format interview_date_w2 %td
+. }
+
+. 
+. cap confirm string variable FPrimary
+
+. if _rc != 0 {
+.     tostring FPrimary, replace force
+. }
+
+. 
+. /* Collapse to household level (one date per FPrimary) */
+. keep FPrimary interview_date_w2
+
+. drop if missing(interview_date_w2)
+(0 observations deleted)
+
+. bysort FPrimary: keep if _n == 1
+(11,582 observations deleted)
+
+. 
+. di "Wave 2 interview dates:"
+Wave 2 interview dates:
+
+. sum interview_date_w2
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+interview_~2 |      4,774    19881.54    103.4004      19787      20311
+
+. di "Range: " %td r(min) " to " %td r(max)
+Range: 05mar2014 to 11aug2015
+
+. 
+. save "$temp/w2_interview_date.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w2_interview_date.dta not
+    found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w2_interview_date.dta saved
+
+. 
+. 
+. /*--- Step 2b: Get child birth dates ---*/
+. 
+. /* Wave 2 birth dates from roster */
+. use "$data/Wave 2/01b2_roster.dta", clear
+(bb01b2_roster)
+
+. 
+. cap confirm string variable FPrimary
+
+. if _rc != 0 {
+.     tostring FPrimary, replace force
+. }
+
+. 
+. /* dateofbirth is stored as float with %td format (already a Stata date) */
+. cap confirm numeric variable dateofbirth
+
+. if _rc == 0 {
+.     gen child_birth_date = dateofbirth
+(3,000 missing values generated)
+.     format child_birth_date %td
+. }
+
+. else {
+.     gen child_birth_date = date(dateofbirth, "DMY")
+.     format child_birth_date %td
+. }
+
+. 
+. /* Filter out clearly erroneous dates (before 1900 or after 2020) */
+. replace child_birth_date = . if child_birth_date < mdy(1,1,1900)
+(11 real changes made, 11 to missing)
+
+. replace child_birth_date = . if child_birth_date > mdy(12,31,2020) & !missing
+> (child_birth_date)
+(0 real changes made)
+
+. 
+. /* Also extract year from yearofbirth as fallback */
+. cap gen birth_year = yearofbirth
+
+. cap gen birth_month = month(child_birth_date)
+
+. 
+. rename hhmid child_hhmid
+
+. keep FPrimary child_hhmid child_birth_date birth_year birth_month
+
+. drop if missing(child_birth_date) & missing(birth_year)
+(242 observations deleted)
+
+. duplicates drop FPrimary child_hhmid, force
+
+Duplicates in terms of FPrimary child_hhmid
+
+(0 observations are duplicates)
+
+. 
+. di "Wave 2 child birth dates (from Wave 2 roster):"
+Wave 2 child birth dates (from Wave 2 roster):
+
+. sum child_birth_date birth_year
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+child_birt~e |     13,345    10456.84    7588.494     -18897      20200
+  birth_year |      2,769    1976.654    22.95768       1894       2014
+
+. 
+. save "$temp/w2_child_birthdates.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w2_child_birthdates.dta not
+    found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w2_child_birthdates.dta saved
+
+. 
+. 
+. /* Wave 3 birth dates from roster */
+. use "$data/Wave 3/01b2_roster.dta", clear
+
+. 
+. cap confirm string variable FPrimary
+
+. if _rc != 0 {
+.     tostring FPrimary, replace force
+. }
+
+. 
+. /* dateofbirth is stored as float with %td format (already a Stata date) */
+. cap confirm numeric variable dateofbirth
+
+. if _rc == 0 {
+.     gen child_birth_date = dateofbirth
+(3,891 missing values generated)
+.     format child_birth_date %td
+. }
+
+. else {
+.     gen child_birth_date = date(dateofbirth, "DMY")
+.     format child_birth_date %td
+. }
+
+. 
+. /* Filter out clearly erroneous dates */
+. replace child_birth_date = . if child_birth_date < mdy(1,1,1900)
+(1 real change made, 1 to missing)
+
+. replace child_birth_date = . if child_birth_date > mdy(12,31,2020) & !missing
+> (child_birth_date)
+(0 real changes made)
+
+. 
+. cap gen birth_year = yearofbirth
+
+. cap gen birth_month = month(child_birth_date)
+
+. 
+. rename hhmid child_hhmid
+
+. keep FPrimary child_hhmid child_birth_date birth_year birth_month
+
+. drop if missing(child_birth_date) & missing(birth_year)
+(1 observation deleted)
+
+. duplicates drop FPrimary child_hhmid, force
+
+Duplicates in terms of FPrimary child_hhmid
+
+(0 observations are duplicates)
+
+. 
+. di "Wave 3 child birth dates (from Wave 3 roster):"
+Wave 3 child birth dates (from Wave 3 roster):
+
+. sum child_birth_date birth_year
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+child_birt~e |     15,114    11604.88    7735.684     -19213      21611
+  birth_year |      3,891    1980.747    23.19922       1910       2019
+
+. 
+. save "$temp/w3_child_birthdates.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w3_child_birthdates.dta not
+    found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w3_child_birthdates.dta saved
+
+. 
+. 
+. /* Wave 1 birth dates from s1d.dta */
+. use "$data/Wave 1/s1d.dta", clear
+
+. 
+. cap confirm string variable FPrimary
+
+. if _rc != 0 {
+.     tostring FPrimary, replace force
+FPrimary was long now str9
+. }
+
+. 
+. /* s1d_3ii = birth month, s1d_3iii = birth year
+>    These are stored as numeric values (1-12 for months, literal years).
+>    Value labels map to themselves, so use numeric values directly. */
+. gen birth_month = s1d_3ii if s1d_3ii >= 1 & s1d_3ii <= 12
+(9,021 missing values generated)
+
+. gen birth_year = s1d_3iii if s1d_3iii >= 1900 & s1d_3iii <= 2020
+(187 missing values generated)
+
+. 
+. /* Construct birth date (use 15th of month as midpoint) */
+. gen child_birth_date = mdy(birth_month, 15, birth_year) if ///
+>     !missing(birth_month) & !missing(birth_year)
+(9,030 missing values generated)
+
+. format child_birth_date %td
+
+. 
+. rename hhmid child_hhmid
+
+. keep FPrimary child_hhmid child_birth_date birth_year birth_month
+
+. drop if missing(child_birth_date) & missing(birth_year)
+(187 observations deleted)
+
+. 
+. if _N > 0 {
+.     duplicates drop FPrimary child_hhmid, force
+
+Duplicates in terms of FPrimary child_hhmid
+
+(0 observations are duplicates)
+. }
+
+. 
+. di "Wave 1 child birth dates (from s1d.dta):"
+Wave 1 child birth dates (from s1d.dta):
+
+. di "N = " _N
+N = 18702
+
+. sum child_birth_date birth_year
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+child_birt~e |      9,859    10234.36    6920.017     -16667      18336
+  birth_year |     18,702    1983.391    21.25814       1905       2010
+
+. 
+. save "$temp/w1_child_birthdates.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w1_child_birthdates.dta not
+    found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/w1_child_birthdates.dta saved
+
+. 
+. 
+. /*--- Step 2c: Identify children in utero during a previous wave ---*/
+. 
+. /* Load analysis data with pregnancy info from Step 1 */
+. use "$temp/analysis_prenatal_step1.dta", clear
+
+. 
+. /* Merge interview dates */
+. merge m:1 FPrimary using "$temp/w1_interview_date.dta", ///
+>     keep(master match) nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         1,380
+        from master                     1,380  
+        from using                          0  
+
+    Matched                            21,557  
+    -----------------------------------------
+
+. merge m:1 FPrimary using "$temp/w2_interview_date.dta", ///
+>     keep(master match) nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         2,341
+        from master                     2,341  
+        from using                          0  
+
+    Matched                            20,596  
+    -----------------------------------------
+
+. 
+. /* Merge child birth dates — use m:1 since analysis data has multiple waves p
+> er child */
+. /* Try Wave 2, then Wave 3, then Wave 1 */
+. merge m:1 FPrimary child_hhmid using "$temp/w2_child_birthdates.dta", ///
+>     keep(master match) nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         6,615
+        from master                     6,615  
+        from using                          0  
+
+    Matched                            16,322  
+    -----------------------------------------
+
+. rename child_birth_date child_birth_date_w2
+
+. rename birth_year birth_year_w2
+
+. rename birth_month birth_month_w2
+
+. 
+. merge m:1 FPrimary child_hhmid using "$temp/w3_child_birthdates.dta", ///
+>     keep(master match) nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         6,319
+        from master                     6,319  
+        from using                          0  
+
+    Matched                            16,618  
+    -----------------------------------------
+
+. rename child_birth_date child_birth_date_w3
+
+. rename birth_year birth_year_w3
+
+. rename birth_month birth_month_w3
+
+. 
+. merge m:1 FPrimary child_hhmid using "$temp/w1_child_birthdates.dta", ///
+>     keep(master match) nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         7,191
+        from master                     7,191  
+        from using                          0  
+
+    Matched                            15,746  
+    -----------------------------------------
+
+. rename child_birth_date child_birth_date_w1
+
+. rename birth_year birth_year_w1
+
+. rename birth_month birth_month_w1
+
+. 
+. /* Use best available birth date (prefer later wave for more recent info) */
+. gen child_birth_date = child_birth_date_w3
+(8,145 missing values generated)
+
+. replace child_birth_date = child_birth_date_w2 if missing(child_birth_date)
+(3,383 real changes made)
+
+. replace child_birth_date = child_birth_date_w1 if missing(child_birth_date)
+(1,924 real changes made)
+
+. format child_birth_date %td
+
+. 
+. gen birth_year_best = birth_year_w3
+(21,111 missing values generated)
+
+. replace birth_year_best = birth_year_w2 if missing(birth_year_best)
+(701 real changes made)
+
+. replace birth_year_best = birth_year_w1 if missing(birth_year_best)
+(14,171 real changes made)
+
+. 
+. di _n "Children with birth dates:"
+
+Children with birth dates:
+
+. count if !missing(child_birth_date)
+  20,099
+
+. count if missing(child_birth_date) & !missing(birth_year_best)
+  2,804
+
+. 
+. /* Compute months between wave interview and child birth */
+. /* Strategy B: Child born 0-9 months after Wave t interview → in utero at Wav
+> e t */
+. 
+. /* For Wave 2 children: were they in utero during Wave 1? */
+. gen months_since_w1 = (child_birth_date - interview_date_w1) / 30.44 ///
+>     if !missing(child_birth_date) & !missing(interview_date_w1)
+(4,041 missing values generated)
+
+. 
+. /* For Wave 3 children: were they in utero during Wave 2? */
+. gen months_since_w2 = (child_birth_date - interview_date_w2) / 30.44 ///
+>     if !missing(child_birth_date) & !missing(interview_date_w2)
+(4,646 missing values generated)
+
+. 
+. di _n "Months between Wave 1 interview and child birth:"
+
+Months between Wave 1 interview and child birth:
+
+. sum months_since_w1, detail
+
+                       months_since_w1
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%    -211.4323      -794.1196
+ 5%    -176.0184      -780.3548
+10%    -152.3653      -719.5138       Obs              18,896
+25%    -106.0447      -666.8857       Sum of wgt.      18,896
+
+50%    -54.86202                      Mean           -57.5353
+                        Largest       Std. dev.      72.60895
+75%    -8.278581       106.9645
+90%     35.54533       107.0631       Variance        5272.06
+95%     55.55191       107.6216       Skewness      -.6079929
+99%     93.52825        109.297       Kurtosis       6.359011
+
+. di _n "Months between Wave 2 interview and child birth:"
+
+Months between Wave 2 interview and child birth:
+
+. sum months_since_w2, detail
+
+                       months_since_w2
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     -263.929      -847.6347
+ 5%    -224.3101      -831.7346
+10%    -201.1826      -772.3062       Obs              18,291
+25%    -155.1577      -718.0026       Sum of wgt.      18,291
+
+50%    -104.0407                      Mean          -106.7237
+                        Largest       Std. dev.      72.46607
+75%    -57.45729       55.25624
+90%    -14.06045       55.74902       Variance       5251.332
+95%     4.664915       55.91327       Skewness      -.6516037
+99%     41.88568       55.97897       Kurtosis       6.544886
+
+. 
+. /* Flag children who were in utero during previous wave (0-9 month window) */
+. gen in_utero_w1 = (months_since_w1 >= 0 & months_since_w1 <= 9) ///
+>     if !missing(months_since_w1)
+(4,041 missing values generated)
+
+. gen in_utero_w2 = (months_since_w2 >= 0 & months_since_w2 <= 9) ///
+>     if !missing(months_since_w2)
+(4,646 missing values generated)
+
+. 
+. di _n "Children in utero during Wave 1 interview:"
+
+Children in utero during Wave 1 interview:
+
+. tab in_utero_w1, m
+
+in_utero_w1 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |     18,304       79.80       79.80
+          1 |        592        2.58       82.38
+          . |      4,041       17.62      100.00
+------------+-----------------------------------
+      Total |     22,937      100.00
+
+. di _n "Children in utero during Wave 2 interview:"
+
+Children in utero during Wave 2 interview:
+
+. tab in_utero_w2, m
+
+in_utero_w2 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |     18,100       78.91       78.91
+          1 |        191        0.83       79.74
+          . |      4,646       20.26      100.00
+------------+-----------------------------------
+      Total |     22,937      100.00
+
+. 
+. 
+. /*--- Step 2d: Link prenatal K10 from previous wave ---*/
+. 
+. /* We need mother's K10 from the wave when the child was in utero.
+>    The current data has m_k10_score for each observation's own wave.
+>    We need to bring in the mother's K10 from the PREVIOUS wave. */
+. 
+. /* Get mother's K10 scores by wave — save as separate temp files */
+. 
+. /* Wave 1 K10 */
+. preserve
+
+.     keep FPrimary mother_hhmid wave m_k10_score m_k10_std
+
+.     keep if !missing(m_k10_score) & wave == 1
+(15,400 observations deleted)
+
+.     duplicates drop FPrimary mother_hhmid, force
+
+Duplicates in terms of FPrimary mother_hhmid
+
+(4,687 observations deleted)
+
+.     rename m_k10_score m_k10_w1
+
+.     rename m_k10_std m_k10_std_w1
+
+.     gen m_depressed_w1 = (m_k10_w1 >= 30) if !missing(m_k10_w1)
+
+.     keep FPrimary mother_hhmid m_k10_w1 m_k10_std_w1 m_depressed_w1
+
+.     save "$temp/mother_k10_w1.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/mother_k10_w1.dta not found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/mother_k10_w1.dta saved
+
+. restore
+
+. 
+. /* Wave 2 K10 */
+. preserve
+
+.     keep FPrimary mother_hhmid wave m_k10_score m_k10_std
+
+.     keep if !missing(m_k10_score) & wave == 2
+(16,776 observations deleted)
+
+.     duplicates drop FPrimary mother_hhmid, force
+
+Duplicates in terms of FPrimary mother_hhmid
+
+(3,637 observations deleted)
+
+.     rename m_k10_score m_k10_w2
+
+.     rename m_k10_std m_k10_std_w2
+
+.     gen m_depressed_w2 = (m_k10_w2 >= 30) if !missing(m_k10_w2)
+
+.     keep FPrimary mother_hhmid m_k10_w2 m_k10_std_w2 m_depressed_w2
+
+.     save "$temp/mother_k10_w2.dta", replace
+(file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/mother_k10_w2.dta not found)
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/mother_k10_w2.dta saved
+
+. restore
+
+. 
+. /* Merge mother's wave-specific K10 */
+. merge m:1 FPrimary mother_hhmid using "$temp/mother_k10_w1.dta", ///
+>     keep(master match) nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         7,387
+        from master                     7,387  
+        from using                          0  
+
+    Matched                            15,550  
+    -----------------------------------------
+
+. merge m:1 FPrimary mother_hhmid using "$temp/mother_k10_w2.dta", ///
+>     keep(master match) nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         8,810
+        from master                     8,810  
+        from using                          0  
+
+    Matched                            14,127  
+    -----------------------------------------
+
+. 
+. /* Assign prenatal K10 from the wave when child was in utero */
+. gen prenatal_k10_B = .
+(22,937 missing values generated)
+
+. gen prenatal_depressed_B = .
+(22,937 missing values generated)
+
+. 
+. /* Child in utero at Wave 1 → assign Wave 1 K10 */
+. replace prenatal_k10_B = m_k10_w1 if in_utero_w1 == 1 & !missing(m_k10_w1)
+(374 real changes made)
+
+. replace prenatal_depressed_B = m_depressed_w1 if in_utero_w1 == 1 & !missing(
+> m_depressed_w1)
+(374 real changes made)
+
+. 
+. /* Child in utero at Wave 2 → assign Wave 2 K10 */
+. replace prenatal_k10_B = m_k10_w2 if in_utero_w2 == 1 & !missing(m_k10_w2)
+(96 real changes made)
+
+. replace prenatal_depressed_B = m_depressed_w2 if in_utero_w2 == 1 & !missing(
+> m_depressed_w2)
+(96 real changes made)
+
+. 
+. label variable prenatal_k10_B "Prenatal K10 (Strategy B: birth timing)"
+
+. label variable prenatal_depressed_B "Prenatal depressed (Strategy B: birth ti
+> ming)"
+
+. 
+. di _n "Strategy B: Children with prenatal depression from birth timing:"
+
+Strategy B: Children with prenatal depression from birth timing:
+
+. count if !missing(prenatal_k10_B)
+  470
+
+. tab wave if !missing(prenatal_k10_B)
+
+Survey Wave |
+   (1=2009, |
+    2=2012, |
+    3=2018) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |         34        7.23        7.23
+          2 |        161       34.26       41.49
+          3 |        275       58.51      100.00
+------------+-----------------------------------
+      Total |        470      100.00
+
+. 
+. /* Also create variant windows for sensitivity */
+. gen in_utero_w1_6mo = (months_since_w1 >= 0 & months_since_w1 <= 6) ///
+>     if !missing(months_since_w1)
+(4,041 missing values generated)
+
+. gen in_utero_w2_6mo = (months_since_w2 >= 0 & months_since_w2 <= 6) ///
+>     if !missing(months_since_w2)
+(4,646 missing values generated)
+
+. gen in_utero_w1_12mo = (months_since_w1 >= 0 & months_since_w1 <= 12) ///
+>     if !missing(months_since_w1)
+(4,041 missing values generated)
+
+. gen in_utero_w2_12mo = (months_since_w2 >= 0 & months_since_w2 <= 12) ///
+>     if !missing(months_since_w2)
+(4,646 missing values generated)
+
+. 
+. /* 6-month window */
+. gen prenatal_k10_B6 = .
+(22,937 missing values generated)
+
+. replace prenatal_k10_B6 = m_k10_w1 if in_utero_w1_6mo == 1 & !missing(m_k10_w
+> 1)
+(245 real changes made)
+
+. replace prenatal_k10_B6 = m_k10_w2 if in_utero_w2_6mo == 1 & !missing(m_k10_w
+> 2)
+(65 real changes made)
+
+. 
+. /* 12-month window */
+. gen prenatal_k10_B12 = .
+(22,937 missing values generated)
+
+. replace prenatal_k10_B12 = m_k10_w1 if in_utero_w1_12mo == 1 & !missing(m_k10
+> _w1)
+(460 real changes made)
+
+. replace prenatal_k10_B12 = m_k10_w2 if in_utero_w2_12mo == 1 & !missing(m_k10
+> _w2)
+(133 real changes made)
+
+. 
+. /* Combined prenatal measure: use Strategy A if available, else Strategy B */
+. gen prenatal_k10 = prenatal_k10_A
+(21,878 missing values generated)
+
+. replace prenatal_k10 = prenatal_k10_B if missing(prenatal_k10)
+(440 real changes made)
+
+. gen prenatal_depressed = prenatal_depressed_A
+(21,878 missing values generated)
+
+. replace prenatal_depressed = prenatal_depressed_B if missing(prenatal_depress
+> ed)
+(440 real changes made)
+
+. label variable prenatal_k10 "Prenatal K10 (combined A+B)"
+
+. label variable prenatal_depressed "Prenatal depressed (combined A+B)"
+
+. 
+. /* Standardize prenatal K10 */
+. egen prenatal_k10_std = std(prenatal_k10)
+(21,438 missing values generated)
+
+. label variable prenatal_k10_std "Prenatal K10 (standardized)"
+
+. 
+. /* Create indicator for prenatal exposure available */
+. gen has_prenatal = !missing(prenatal_k10)
+
+. gen has_prenatal_A = !missing(prenatal_k10_A)
+
+. gen has_prenatal_B = !missing(prenatal_k10_B)
+
+. label variable has_prenatal "Has prenatal depression measure"
+
+. 
+. di _n "=============================================="
+
+==============================================
+
+. di "PRENATAL DEPRESSION MEASURES CONSTRUCTED"
+PRENATAL DEPRESSION MEASURES CONSTRUCTED
+
+. di "=============================================="
+==============================================
+
+. di _n "Strategy A (pregnant at interview):"
+
+Strategy A (pregnant at interview):
+
+. count if has_prenatal_A == 1
+  1,059
+
+. di "Strategy B (birth timing):"
+Strategy B (birth timing):
+
+. count if has_prenatal_B == 1
+  470
+
+. di "Combined (A or B):"
+Combined (A or B):
+
+. count if has_prenatal == 1
+  1,499
+
+. di "With cognitive outcomes:"
+With cognitive outcomes:
+
+. count if has_prenatal == 1 & analysis_sample == 1
+  847
+
+. 
+. save "$temp/analysis_prenatal.dta", replace
+file
+    /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers/OU/Hea
+    > lth/Ghana_mental_health/maternal_depression_child_cog_devlopment/progra
+    > ms/stata/Draft1_Feb2026_MH_Pregnancy/temp/analysis_prenatal.dta saved
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     PART 3: SUMMARY STATISTICS
+> =============================================================================
+> =*/
+. 
+. di _n(3) "=============================================="
+
+
+
+==============================================
+
+. di "PART 3: Summary statistics"
+PART 3: Summary statistics
+
+. di "=============================================="
+==============================================
+
+. 
+. /* Mothers pregnant at each wave */
+. di _n "--- Mothers currently pregnant by wave ---"
+
+--- Mothers currently pregnant by wave ---
+
+. tab wave pregnant_now if !missing(m_k10_score), row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+    Survey |
+      Wave |
+  (1=2009, |   Mother currently
+   2=2012, | pregnant at interview
+   3=2018) |         0          1 |     Total
+-----------+----------------------+----------
+         1 |     6,965        405 |     7,370 
+           |     94.50       5.50 |    100.00 
+-----------+----------------------+----------
+         2 |     4,844        400 |     5,244 
+           |     92.37       7.63 |    100.00 
+-----------+----------------------+----------
+         3 |     3,720        254 |     3,974 
+           |     93.61       6.39 |    100.00 
+-----------+----------------------+----------
+     Total |    15,529      1,059 |    16,588 
+           |     93.62       6.38 |    100.00 
+
+. 
+. di _n "--- Mothers pregnant in last year by wave ---"
+
+--- Mothers pregnant in last year by wave ---
+
+. tab wave pregnant_last_year if !missing(m_k10_score), row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+    Survey |
+      Wave |
+  (1=2009, |  Mother pregnant in
+   2=2012, |       last year
+   3=2018) |         0          1 |     Total
+-----------+----------------------+----------
+         1 |     5,867      1,141 |     7,008 
+           |     83.72      16.28 |    100.00 
+-----------+----------------------+----------
+         2 |     3,914        920 |     4,834 
+           |     80.97      19.03 |    100.00 
+-----------+----------------------+----------
+         3 |     3,177        543 |     3,720 
+           |     85.40      14.60 |    100.00 
+-----------+----------------------+----------
+     Total |    12,958      2,604 |    15,562 
+           |     83.27      16.73 |    100.00 
+
+. 
+. /* Prenatal depression prevalence */
+. di _n "--- Prenatal K10 scores ---"
+
+--- Prenatal K10 scores ---
+
+. sum prenatal_k10 if has_prenatal == 1, detail
+
+                 Prenatal K10 (combined A+B)
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           10             10
+ 5%           10             10
+10%           12             10       Obs               1,499
+25%           15             10       Sum of wgt.       1,499
+
+50%           19                      Mean           19.41961
+                        Largest       Std. dev.      5.862411
+75%           23             39
+90%           28             39       Variance       34.36787
+95%           30             39       Skewness         .42139
+99%           34             42       Kurtosis        2.71993
+
+. 
+. di _n "--- Prenatal depression rate (K10 >= 30) ---"
+
+--- Prenatal depression rate (K10 >= 30) ---
+
+. tab prenatal_depressed if has_prenatal == 1
+
+   Prenatal |
+  depressed |
+  (combined |
+       A+B) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      1,421       94.80       94.80
+          1 |         78        5.20      100.00
+------------+-----------------------------------
+      Total |      1,499      100.00
+
+. 
+. /* Compare prenatal-exposed vs unexposed children */
+. di _n "--- Comparison: children with prenatal exposure ---"
+
+--- Comparison: children with prenatal exposure ---
+
+. di _n "Cognitive index:"
+
+Cognitive index:
+
+. ttest cog_index if analysis_sample == 1, by(has_prenatal)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       0 |  11,705    .0160576    .0084814    .9175959   -.0005673    .0326825
+       1 |     802   -.1679763    .0322901    .9144431   -.2313596   -.1045931
+---------+--------------------------------------------------------------------
+Combined |  12,507    .0042566    .0082127    .9184648   -.0118416    .0203548
+---------+--------------------------------------------------------------------
+    diff |            .1840339    .0334857                .1183968    .2496711
+------------------------------------------------------------------------------
+    diff = mean(0) - mean(1)                                      t =   5.4959
+H0: diff = 0                                     Degrees of freedom =    12505
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 1.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) = 0.0000
+
+. 
+. di _n "Child age:"
+
+Child age:
+
+. ttest c_age if analysis_sample == 1, by(has_prenatal)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       0 |  12,899    10.56749    .0324571    3.686274    10.50387    10.63111
+       1 |     847    8.987013     .111076    3.232675    8.768996     9.20503
+---------+--------------------------------------------------------------------
+Combined |  13,746     10.4701    .0313837    3.679525    10.40858    10.53162
+---------+--------------------------------------------------------------------
+    diff |            1.580473    .1298216                1.326005    1.834941
+------------------------------------------------------------------------------
+    diff = mean(0) - mean(1)                                      t =  12.1742
+H0: diff = 0                                     Degrees of freedom =    13744
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 1.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) = 0.0000
+
+. 
+. di _n "Household size:"
+
+Household size:
+
+. ttest hh_size if analysis_sample == 1, by(has_prenatal)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       0 |  12,899    5.837507    .0205392    2.332718    5.797247    5.877767
+       1 |     847    6.199528    .0801506    2.332644     6.04221    6.356845
+---------+--------------------------------------------------------------------
+Combined |  13,746    5.859814    .0199095    2.334253    5.820788    5.898839
+---------+--------------------------------------------------------------------
+    diff |            -.362021    .0827427                -.524208   -.1998339
+------------------------------------------------------------------------------
+    diff = mean(0) - mean(1)                                      t =  -4.3753
+H0: diff = 0                                     Degrees of freedom =    13744
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) = 1.0000
+
+. 
+. /* Among those with prenatal measures: depressed vs not */
+. di _n "--- Among prenatally measured: depressed vs not ---"
+
+--- Among prenatally measured: depressed vs not ---
+
+. di _n "Cognitive index:"
+
+Cognitive index:
+
+. cap ttest cog_index if has_prenatal == 1 & analysis_sample == 1, by(prenatal_
+> depressed)
+
+. 
+. di _n "Ravens:"
+
+Ravens:
+
+. cap ttest ravens_std if has_prenatal == 1 & analysis_sample == 1, by(prenatal
+> _depressed)
+
+. 
+. /* Tabulate sample sizes */
+. di _n "--- Sample sizes for estimation ---"
+
+--- Sample sizes for estimation ---
+
+. di "Prenatal + cognitive outcome + analysis sample:"
+Prenatal + cognitive outcome + analysis sample:
+
+. count if has_prenatal == 1 & analysis_sample == 1 & !missing(cog_index)
+  802
+
+. 
+. di "Strategy A only:"
+Strategy A only:
+
+. count if has_prenatal_A == 1 & analysis_sample == 1 & !missing(cog_index)
+  641
+
+. 
+. di "Strategy B only:"
+Strategy B only:
+
+. count if has_prenatal_B == 1 & analysis_sample == 1 & !missing(cog_index)
+  169
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     PART 4: ESTIMATION
+> =============================================================================
+> =*/
+. 
+. di _n(3) "=============================================="
+
+
+
+==============================================
+
+. di "PART 4: Estimation — Prenatal Depression"
+PART 4: Estimation — Prenatal Depression
+
+. di "=============================================="
+==============================================
+
+. 
+. /* Control variable sets (same as main estimation) */
+. global child_controls "c_age i.c_female"
+
+. global maternal_controls "m_age_harmonized"
+
+. global hh_controls "hh_size ln_pc_consumption"
+
+. global full_controls "$child_controls $maternal_controls $hh_controls"
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE P1: EFFECT OF PRENATAL DEPRESSION ON CHILD COGNITION
+> =============================================================================
+> =*/
+. 
+. di _n "--- Table P1: Prenatal depression and child cognition ---"
+
+--- Table P1: Prenatal depression and child cognition ---
+
+. 
+. eststo clear
+
+. 
+. /* Column 1: OLS — Prenatal K10 (standardized) on cognitive index */
+. cap noi eststo p1: reg cog_index prenatal_k10_std ///
+>     if has_prenatal == 1 & analysis_sample == 1, ///
+>     cluster(ea_id)
+
+Linear regression                               Number of obs     =        779
+                                                F(1, 204)         =       0.03
+                                                Prob > F          =     0.8700
+                                                R-squared         =     0.0001
+                                                Root MSE          =        .92
+
+                                (Std. err. adjusted for 205 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+prenatal_k~d |  -.0068892   .0420258    -0.16   0.870    -.0897499    .0759715
+       _cons |  -.1674991   .0356761    -4.69   0.000    -.2378403    -.097158
+------------------------------------------------------------------------------
+
+. if _rc == 0 {
+.     estadd local controls "No"
+
+added macro:
+           e(controls) : "No"
+.     estadd local ea_fe "No"
+
+added macro:
+              e(ea_fe) : "No"
+.     estadd local wave_fe "No"
+
+added macro:
+            e(wave_fe) : "No"
+. }
+
+. 
+. /* Column 2: OLS + Full controls */
+. cap noi eststo p2: reg cog_index prenatal_k10_std $full_controls ///
+>     if has_prenatal == 1 & analysis_sample == 1, ///
+>     cluster(ea_id)
+
+Linear regression                               Number of obs     =        779
+                                                F(6, 204)         =       8.36
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0712
+                                                Root MSE          =     .88951
+
+                                (Std. err. adjusted for 205 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+prenatal_k~d |  -.0092432   .0380523    -0.24   0.808    -.0842694    .0657831
+       c_age |    .071461   .0127682     5.60   0.000     .0462863    .0966356
+  1.c_female |  -.0874318   .0584413    -1.50   0.136    -.2026582    .0277946
+m_age_harm~d |   -.008416   .0040457    -2.08   0.039    -.0163928   -.0004391
+     hh_size |   .0163222   .0165746     0.98   0.326    -.0163573    .0490016
+ln_pc_cons~n |  -.1022753   .0384738    -2.66   0.008    -.1781326   -.0264181
+       _cons |  -.1588374   .3010538    -0.53   0.598    -.7524133    .4347385
+------------------------------------------------------------------------------
+
+. if _rc == 0 {
+.     estadd local controls "Yes"
+
+added macro:
+           e(controls) : "Yes"
+.     estadd local ea_fe "No"
+
+added macro:
+              e(ea_fe) : "No"
+.     estadd local wave_fe "No"
+
+added macro:
+            e(wave_fe) : "No"
+. }
+
+. 
+. /* Column 3: EA + Wave FE */
+. cap noi eststo p3: reghdfe cog_index prenatal_k10_std ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption ///
+>     if has_prenatal == 1 & analysis_sample == 1, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 55 singleton observations)
+(MWFE estimator converged in 4 iterations)
+
+HDFE Linear regression                            Number of obs   =        724
+Absorbing 2 HDFE groups                           F(   6,    149) =       3.90
+Statistics robust to heteroskedasticity           Prob > F        =     0.0012
+                                                  R-squared       =     0.2971
+                                                  Adj R-squared   =     0.1021
+                                                  Within R-sq.    =     0.0533
+Number of clusters (ea_id)   =        150         Root MSE        =     0.8821
+
+                                (Std. err. adjusted for 150 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+prenatal_k~d |  -.0017393   .0519809    -0.03   0.973    -.1044543    .1009756
+       c_age |   .0655936   .0155065     4.23   0.000     .0349526    .0962346
+  1.c_female |  -.0630948   .0635623    -0.99   0.322    -.1886946    .0625051
+m_age_harm~d |  -.0010715    .006143    -0.17   0.862    -.0132101     .011067
+     hh_size |   .0183072   .0256409     0.71   0.476    -.0323596     .068974
+ln_pc_cons~n |   .0556721   .0705359     0.79   0.431    -.0837079     .195052
+       _cons |  -.9982032   .4449901    -2.24   0.026    -1.877509    -.118897
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       150         150           0    *|
+        wave |         3           1           2     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. if _rc == 0 {
+.     estadd local controls "Yes"
+
+added macro:
+           e(controls) : "Yes"
+.     estadd local ea_fe "Yes"
+
+added macro:
+              e(ea_fe) : "Yes"
+.     estadd local wave_fe "Yes"
+
+added macro:
+            e(wave_fe) : "Yes"
+. }
+
+. 
+. /* Column 4: Binary prenatal depression */
+. cap noi eststo p4: reghdfe cog_index prenatal_depressed ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption ///
+>     if has_prenatal == 1 & analysis_sample == 1, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 55 singleton observations)
+(MWFE estimator converged in 4 iterations)
+
+HDFE Linear regression                            Number of obs   =        724
+Absorbing 2 HDFE groups                           F(   6,    149) =       3.85
+Statistics robust to heteroskedasticity           Prob > F        =     0.0013
+                                                  R-squared       =     0.2980
+                                                  Adj R-squared   =     0.1033
+                                                  Within R-sq.    =     0.0545
+Number of clusters (ea_id)   =        150         Root MSE        =     0.8815
+
+                                (Std. err. adjusted for 150 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+prenatal_d~d |   .1839682   .2631608     0.70   0.486     -.336041    .7039774
+       c_age |   .0655472   .0155623     4.21   0.000     .0347958    .0962985
+  1.c_female |  -.0613188   .0637968    -0.96   0.338    -.1873821    .0647444
+m_age_harm~d |  -.0006335   .0062057    -0.10   0.919     -.012896    .0116289
+     hh_size |   .0207944    .026773     0.78   0.439    -.0321094    .0736982
+ln_pc_cons~n |   .0478634   .0704867     0.68   0.498    -.0914193    .1871461
+       _cons |  -1.008617   .4475513    -2.25   0.026    -1.892984   -.1242493
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       150         150           0    *|
+        wave |         3           1           2     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. if _rc == 0 {
+.     estadd local controls "Yes"
+
+added macro:
+           e(controls) : "Yes"
+.     estadd local ea_fe "Yes"
+
+added macro:
+              e(ea_fe) : "Yes"
+.     estadd local wave_fe "Yes"
+
+added macro:
+            e(wave_fe) : "Yes"
+. }
+
+. 
+. /* Column 5: Prenatal vs concurrent depression in same model */
+. cap noi eststo p5: reghdfe cog_index prenatal_k10_std m_k10_std ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption ///
+>     if has_prenatal == 1 & analysis_sample == 1, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 55 singleton observations)
+(MWFE estimator converged in 4 iterations)
+
+HDFE Linear regression                            Number of obs   =        724
+Absorbing 2 HDFE groups                           F(   7,    149) =       3.48
+Statistics robust to heteroskedasticity           Prob > F        =     0.0018
+                                                  R-squared       =     0.2974
+                                                  Adj R-squared   =     0.1009
+                                                  Within R-sq.    =     0.0537
+Number of clusters (ea_id)   =        150         Root MSE        =     0.8827
+
+                                (Std. err. adjusted for 150 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+prenatal_k~d |  -.0265587   .0568239    -0.47   0.641    -.1388435    .0857261
+   m_k10_std |   .0350972   .0530846     0.66   0.510    -.0697987    .1399931
+       c_age |   .0654285    .015495     4.22   0.000     .0348102    .0960467
+  1.c_female |  -.0645627   .0632391    -1.02   0.309    -.1895239    .0603986
+m_age_harm~d |  -.0008778   .0061052    -0.14   0.886    -.0129417    .0111861
+     hh_size |   .0187262   .0258539     0.72   0.470    -.0323615    .0698138
+ln_pc_cons~n |    .049236   .0707621     0.70   0.488    -.0905909    .1890629
+       _cons |  -.9876443   .4451974    -2.22   0.028     -1.86736   -.1079283
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       150         150           0    *|
+        wave |         3           1           2     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. if _rc == 0 {
+.     estadd local controls "Yes"
+
+added macro:
+           e(controls) : "Yes"
+.     estadd local ea_fe "Yes"
+
+added macro:
+              e(ea_fe) : "Yes"
+.     estadd local wave_fe "Yes"
+
+added macro:
+            e(wave_fe) : "Yes"
+. }
+
+. 
+. /* Build model list (only include successful estimations) */
+. local p1_models ""
+
+. foreach m in p1 p2 p3 p4 p5 {
+  2.     cap estimates describe `m'
+  3.     if _rc == 0 local p1_models "`p1_models' `m'"
+  4. }
+
+. 
+. /* LaTeX output */
+. if "`p1_models'" != "" {
+.     cap noi esttab `p1_models' using "$results/TableP1_PrenatalDepression.tex
+> ", replace ///
+>         b(3) se(3) ///
+>         star(* 0.10 ** 0.05 *** 0.01) ///
+>         title("Effect of Prenatal Depression on Child Cognitive Development")
+>  ///
+>         mtitles("OLS" "OLS" "EA FE" "EA FE" "EA FE") ///
+>         keep(prenatal_k10_std prenatal_depressed m_k10_std) ///
+>         order(prenatal_k10_std prenatal_depressed m_k10_std) ///
+>         coeflabels( ///
+>             prenatal_k10_std "Prenatal depression (std. K10)" ///
+>             prenatal_depressed "Prenatally depressed (K10 $\geq$ 30)" ///
+>             m_k10_std "Concurrent depression (std. K10)" ///
+>         ) ///
+>         stats(controls ea_fe wave_fe N r2, ///
+>             labels("Controls" "EA FE" "Wave FE" "Observations" "\$R^2$") ///
+>             fmt(%s %s %s %9.0fc %9.3f)) ///
+>         nonotes ///
+>         addnotes("Standard errors clustered at the EA level in parentheses." 
+> ///
+>                  "Prenatal depression identified via (A) pregnancy at intervi
+> ew and" ///
+>                  "(B) birth timing (child born 0--9 months after previous wav
+> e interview)." ///
+>                  "Controls: child age, child gender, mother's age," ///
+>                  "household size, and log per capita consumption." ///
+>                  "*** p$<$0.01, ** p$<$0.05, * p$<$0.1") ///
+>         booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026_MH_Pregnancy/TableP1_PrenatalDepression.tex)
+. 
+.     /* Text output */
+.     cap noi esttab `p1_models' using "$results/TableP1_PrenatalDepression.txt
+> ", replace ///
+>         b(3) se(3) ///
+>         star(* 0.10 ** 0.05 *** 0.01) ///
+>         title("Effect of Prenatal Depression on Child Cognitive Development")
+>  ///
+>         mtitles("OLS" "OLS" "EA FE" "EA FE (Binary)" "EA FE (Both)") ///
+>         keep(prenatal_k10_std prenatal_depressed m_k10_std) ///
+>         order(prenatal_k10_std prenatal_depressed m_k10_std) ///
+>         stats(controls ea_fe wave_fe N r2, ///
+>             labels("Controls" "EA FE" "Wave FE" "Observations" "R-squared") /
+> //
+>             fmt(%s %s %s %9.0fc %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026_MH_Pregnancy/TableP1_PrenatalDepression.txt)
+. 
+.     di _n "Table P1 saved."
+
+Table P1 saved.
+. }
+
+. else {
+.     di as error "WARNING: No models estimated for Table P1 — sample may be to
+> o small."
+. }
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     TABLE P2: SENSITIVITY ANALYSES
+> =============================================================================
+> =*/
+. 
+. di _n "--- Table P2: Sensitivity analyses ---"
+
+--- Table P2: Sensitivity analyses ---
+
+. 
+. eststo clear
+
+. 
+. /* Standardize the alternative-window prenatal K10 scores */
+. cap egen prenatal_k10_B6_std = std(prenatal_k10_B6)
+
+. cap egen prenatal_k10_B12_std = std(prenatal_k10_B12)
+
+. 
+. /* Column 1: Baseline (0-9 month window) — for reference */
+. cap noi eststo s1: reghdfe cog_index prenatal_k10_std ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption ///
+>     if has_prenatal == 1 & analysis_sample == 1, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 55 singleton observations)
+(MWFE estimator converged in 4 iterations)
+
+HDFE Linear regression                            Number of obs   =        724
+Absorbing 2 HDFE groups                           F(   6,    149) =       3.90
+Statistics robust to heteroskedasticity           Prob > F        =     0.0012
+                                                  R-squared       =     0.2971
+                                                  Adj R-squared   =     0.1021
+                                                  Within R-sq.    =     0.0533
+Number of clusters (ea_id)   =        150         Root MSE        =     0.8821
+
+                                (Std. err. adjusted for 150 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+prenat~0_std |  -.0017393   .0519809    -0.03   0.973    -.1044543    .1009756
+       c_age |   .0655936   .0155065     4.23   0.000     .0349526    .0962346
+  1.c_female |  -.0630948   .0635623    -0.99   0.322    -.1886946    .0625051
+m_age_harm~d |  -.0010715    .006143    -0.17   0.862    -.0132101     .011067
+     hh_size |   .0183072   .0256409     0.71   0.476    -.0323596     .068974
+ln_pc_cons~n |   .0556721   .0705359     0.79   0.431    -.0837079     .195052
+       _cons |  -.9982032   .4449901    -2.24   0.026    -1.877509    -.118897
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       150         150           0    *|
+        wave |         3           1           2     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. if _rc == 0 {
+.     estadd local window "0--9 months"
+
+added macro:
+             e(window) : "0--9 months"
+.     estadd local outcome "Cog Index"
+
+added macro:
+            e(outcome) : "Cog Index"
+. }
+
+. 
+. /* Column 2: Tighter window (0-6 months) */
+. cap noi eststo s2: reghdfe cog_index prenatal_k10_B6_std ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption ///
+>     if !missing(prenatal_k10_B6) & analysis_sample == 1, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 75 singleton observations)
+(MWFE estimator converged in 3 iterations)
+
+HDFE Linear regression                            Number of obs   =         33
+Absorbing 2 HDFE groups                           F(   6,     14) =       3.29
+Statistics robust to heteroskedasticity           Prob > F        =     0.0311
+                                                  R-squared       =     0.9520
+                                                  Adj R-squared   =     0.8604
+                                                  Within R-sq.    =     0.4271
+Number of clusters (ea_id)   =         15         Root MSE        =     0.2267
+
+                                 (Std. err. adjusted for 15 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+prenat~6_std |  -.0488395   .0561147    -0.87   0.399    -.1691936    .0715146
+       c_age |  -.5487473   .3241875    -1.69   0.113     -1.24406    .1465656
+  1.c_female |   .1647428   .1094571     1.51   0.155    -.0700193    .3995048
+m_age_harm~d |   .0104692   .0074475     1.41   0.182    -.0055041    .0264426
+     hh_size |  -.0087271   .0255629    -0.34   0.738    -.0635541    .0460999
+ln_pc_cons~n |   .0916531   .1331972     0.69   0.503    -.1940264    .3773327
+       _cons |   2.990406   2.872407     1.04   0.315    -3.170295    9.151107
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |        15          15           0    *|
+        wave |         2           1           1     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. if _rc == 0 {
+.     estadd local window "0--6 months"
+
+added macro:
+             e(window) : "0--6 months"
+.     estadd local outcome "Cog Index"
+
+added macro:
+            e(outcome) : "Cog Index"
+. }
+
+. 
+. /* Column 3: Wider window (0-12 months) */
+. cap noi eststo s3: reghdfe cog_index prenatal_k10_B12_std ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption ///
+>     if !missing(prenatal_k10_B12) & analysis_sample == 1, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 103 singleton observations)
+(MWFE estimator converged in 3 iterations)
+
+HDFE Linear regression                            Number of obs   =        104
+Absorbing 2 HDFE groups                           F(   6,     45) =       1.00
+Statistics robust to heteroskedasticity           Prob > F        =     0.4401
+                                                  R-squared       =     0.7376
+                                                  Adj R-squared   =     0.4700
+                                                  Within R-sq.    =     0.0887
+Number of clusters (ea_id)   =         46         Root MSE        =     0.3153
+
+                                 (Std. err. adjusted for 46 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+prenat~2_std |  -.0271837   .0392254    -0.69   0.492    -.1061877    .0518202
+       c_age |   .0218242   .0534534     0.41   0.685    -.0858366    .1294849
+  1.c_female |   .0441907   .0903691     0.49   0.627     -.137822    .2262034
+m_age_harm~d |   .0080175   .0045042     1.78   0.082    -.0010545    .0170895
+     hh_size |   .0014606   .0159776     0.09   0.928    -.0307199    .0336412
+ln_pc_cons~n |   .0681462   .0914314     0.75   0.460    -.1160062    .2522986
+       _cons |  -1.377908   .4934758    -2.79   0.008    -2.371819    -.383997
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |        46          46           0    *|
+        wave |         2           1           1     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. if _rc == 0 {
+.     estadd local window "0--12 months"
+
+added macro:
+             e(window) : "0--12 months"
+.     estadd local outcome "Cog Index"
+
+added macro:
+            e(outcome) : "Cog Index"
+. }
+
+. 
+. /* Column 4: Raven's score only as outcome */
+. cap noi eststo s4: reghdfe ravens_std prenatal_k10_std ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption ///
+>     if has_prenatal == 1 & analysis_sample == 1, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 55 singleton observations)
+(MWFE estimator converged in 4 iterations)
+
+HDFE Linear regression                            Number of obs   =        724
+Absorbing 2 HDFE groups                           F(   6,    149) =       0.89
+Statistics robust to heteroskedasticity           Prob > F        =     0.5060
+                                                  R-squared       =     0.2616
+                                                  Adj R-squared   =     0.0568
+                                                  Within R-sq.    =     0.0119
+Number of clusters (ea_id)   =        150         Root MSE        =     0.9844
+
+                                (Std. err. adjusted for 150 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+  ravens_std | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+prenat~0_std |  -.0034333   .0567481    -0.06   0.952    -.1155683    .1087016
+       c_age |   .0208951   .0157688     1.33   0.187    -.0102643    .0520544
+  1.c_female |  -.0744386   .0732823    -1.02   0.311    -.2192453    .0703682
+m_age_harm~d |   .0073763   .0079168     0.93   0.353    -.0082674      .02302
+     hh_size |   .0206236   .0269606     0.76   0.446    -.0326508     .073898
+ln_pc_cons~n |   .0673428   .0769062     0.88   0.383    -.0846248    .2193104
+       _cons |  -.7819205   .5001385    -1.56   0.120    -1.770201    .2063597
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       150         150           0    *|
+        wave |         3           1           2     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. if _rc == 0 {
+.     estadd local window "0--9 months"
+
+added macro:
+             e(window) : "0--9 months"
+.     estadd local outcome "Raven's"
+
+added macro:
+            e(outcome) : "Raven's"
+. }
+
+. 
+. /* Column 5: Adding current depression as control */
+. cap noi eststo s5: reghdfe cog_index prenatal_k10_std m_k10_std ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption ///
+>     if has_prenatal == 1 & analysis_sample == 1, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 55 singleton observations)
+(MWFE estimator converged in 4 iterations)
+
+HDFE Linear regression                            Number of obs   =        724
+Absorbing 2 HDFE groups                           F(   7,    149) =       3.48
+Statistics robust to heteroskedasticity           Prob > F        =     0.0018
+                                                  R-squared       =     0.2974
+                                                  Adj R-squared   =     0.1009
+                                                  Within R-sq.    =     0.0537
+Number of clusters (ea_id)   =        150         Root MSE        =     0.8827
+
+                                (Std. err. adjusted for 150 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+prenat~0_std |  -.0265587   .0568239    -0.47   0.641    -.1388435    .0857261
+   m_k10_std |   .0350972   .0530846     0.66   0.510    -.0697987    .1399931
+       c_age |   .0654285    .015495     4.22   0.000     .0348102    .0960467
+  1.c_female |  -.0645627   .0632391    -1.02   0.309    -.1895239    .0603986
+m_age_harm~d |  -.0008778   .0061052    -0.14   0.886    -.0129417    .0111861
+     hh_size |   .0187262   .0258539     0.72   0.470    -.0323615    .0698138
+ln_pc_cons~n |    .049236   .0707621     0.70   0.488    -.0905909    .1890629
+       _cons |  -.9876443   .4451974    -2.22   0.028     -1.86736   -.1079283
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       150         150           0    *|
+        wave |         3           1           2     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. if _rc == 0 {
+.     estadd local window "0--9 months"
+
+added macro:
+             e(window) : "0--9 months"
+.     estadd local outcome "Cog Index"
+
+added macro:
+            e(outcome) : "Cog Index"
+. }
+
+. 
+. /* Column 6: Strategy A only (pregnant at interview) */
+. cap noi eststo s6: reghdfe cog_index prenatal_k10_std ///
+>     $child_controls $maternal_controls hh_size ln_pc_consumption ///
+>     if has_prenatal_A == 1 & analysis_sample == 1, ///
+>     absorb(ea_id wave) cluster(ea_id)
+(dropped 28 singleton observations)
+(MWFE estimator converged in 4 iterations)
+
+HDFE Linear regression                            Number of obs   =        590
+Absorbing 2 HDFE groups                           F(   6,    130) =       3.98
+Statistics robust to heteroskedasticity           Prob > F        =     0.0011
+                                                  R-squared       =     0.2923
+                                                  Adj R-squared   =     0.0758
+                                                  Within R-sq.    =     0.0518
+Number of clusters (ea_id)   =        131         Root MSE        =     0.9342
+
+                                (Std. err. adjusted for 131 clusters in ea_id)
+------------------------------------------------------------------------------
+             |               Robust
+   cog_index | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+prenat~0_std |   .0489848   .0684854     0.72   0.476    -.0865054     .184475
+       c_age |   .0579917   .0169329     3.42   0.001      .024492    .0914914
+  1.c_female |  -.0964629   .0756651    -1.27   0.205    -.2461572    .0532315
+m_age_harm~d |   .0018667   .0130848     0.14   0.887      -.02402    .0277535
+     hh_size |   .0371175   .0317806     1.17   0.245    -.0257565    .0999916
+ln_pc_cons~n |  -.0160625   .1028952    -0.16   0.876    -.2196284    .1875033
+       _cons |  -.7821648   .6529151    -1.20   0.233    -2.073879    .5095497
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+       ea_id |       131         131           0    *|
+        wave |         3           1           2     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. if _rc == 0 {
+.     estadd local window "Strategy A only"
+
+added macro:
+             e(window) : "Strategy A only"
+.     estadd local outcome "Cog Index"
+
+added macro:
+            e(outcome) : "Cog Index"
+. }
+
+. 
+. /* Build model list */
+. local p2_models ""
+
+. foreach m in s1 s2 s3 s4 s5 s6 {
+  2.     cap estimates describe `m'
+  3.     if _rc == 0 local p2_models "`p2_models' `m'"
+  4. }
+
+. 
+. /* LaTeX output */
+. if "`p2_models'" != "" {
+.     cap noi esttab `p2_models' using "$results/TableP2_PrenatalSensitivity.te
+> x", replace ///
+>         b(3) se(3) ///
+>         star(* 0.10 ** 0.05 *** 0.01) ///
+>         title("Prenatal Depression: Sensitivity Analyses") ///
+>         mtitles("Baseline" "6-month" "12-month" "Raven's" "+Current" "Strat A
+> ") ///
+>         keep(prenatal_k10_std prenatal_k10_B6_std prenatal_k10_B12_std m_k10_
+> std) ///
+>         order(prenatal_k10_std prenatal_k10_B6_std prenatal_k10_B12_std m_k10
+> _std) ///
+>         coeflabels( ///
+>             prenatal_k10_std "Prenatal depression (std. K10)" ///
+>             prenatal_k10_B6_std "Prenatal depression (6-mo window)" ///
+>             prenatal_k10_B12_std "Prenatal depression (12-mo window)" ///
+>             m_k10_std "Concurrent depression (std. K10)" ///
+>         ) ///
+>         stats(window outcome N r2, ///
+>             labels("Timing window" "Outcome" "Observations" "\$R^2$") ///
+>             fmt(%s %s %9.0fc %9.3f)) ///
+>         nonotes ///
+>         addnotes("Standard errors clustered at the EA level in parentheses." 
+> ///
+>                  "All models include EA and wave fixed effects plus full cont
+> rols." ///
+>                  "*** p$<$0.01, ** p$<$0.05, * p$<$0.1") ///
+>         booktabs
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026_MH_Pregnancy/TableP2_PrenatalSensitivity.tex)
+. 
+.     /* Text output */
+.     cap noi esttab `p2_models' using "$results/TableP2_PrenatalSensitivity.tx
+> t", replace ///
+>         b(3) se(3) ///
+>         star(* 0.10 ** 0.05 *** 0.01) ///
+>         title("Prenatal Depression: Sensitivity Analyses") ///
+>         mtitles("Baseline" "6-month" "12-month" "Raven's" "+Current" "Strat A
+> ") ///
+>         keep(prenatal_k10_std prenatal_k10_B6_std prenatal_k10_B12_std m_k10_
+> std) ///
+>         stats(window outcome N r2, ///
+>             labels("Timing window" "Outcome" "Observations" "R-squared") ///
+>             fmt(%s %s %9.0fc %9.3f))
+(output written to /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_
+> Papers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment
+> /rersults/Draft1_Feb2026_MH_Pregnancy/TableP2_PrenatalSensitivity.txt)
+. 
+.     di _n "Table P2 saved."
+
+Table P2 saved.
+. }
+
+. else {
+.     di as error "WARNING: No models estimated for Table P2 — sample may be to
+> o small."
+. }
+
+. 
+. 
+. /*===========================================================================
+> ===
+>     PART 5: CLEAN UP AND REPORT
+> =============================================================================
+> =*/
+. 
+. di _n(3) "=============================================="
+
+
+
+==============================================
+
+. di "PRENATAL DEPRESSION ANALYSIS COMPLETE"
+PRENATAL DEPRESSION ANALYSIS COMPLETE
+
+. di "=============================================="
+==============================================
+
+. di _n "Output saved to: $results/"
+
+Output saved to: /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Pa
+> pers/OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment/r
+> ersults/Draft1_Feb2026_MH_Pregnancy/
+
+. di "  TableP1_PrenatalDepression.tex/.txt"
+  TableP1_PrenatalDepression.tex/.txt
+
+. di "  TableP2_PrenatalSensitivity.tex/.txt"
+  TableP2_PrenatalSensitivity.tex/.txt
+
+. 
+. di _n "--- Final sample summary ---"
+
+--- Final sample summary ---
+
+. di "Total observations in analysis data: " _N
+Total observations in analysis data: 22937
+
+. di "Analysis sample: "
+Analysis sample: 
+
+. count if analysis_sample == 1
+  13,746
+
+. di "With prenatal measure (combined): "
+With prenatal measure (combined): 
+
+. count if has_prenatal == 1
+  1,499
+
+. di "With prenatal measure + cognitive outcome: "
+With prenatal measure + cognitive outcome: 
+
+. count if has_prenatal == 1 & analysis_sample == 1
+  847
+
+. di "  Strategy A (pregnant at interview): "
+  Strategy A (pregnant at interview): 
+
+. count if has_prenatal_A == 1 & analysis_sample == 1
+  684
+
+. di "  Strategy B (birth timing): "
+  Strategy B (birth timing): 
+
+. count if has_prenatal_B == 1 & analysis_sample == 1
+  172
+
+. 
+. di _n "Prenatal depression prevalence (among measured):"
+
+Prenatal depression prevalence (among measured):
+
+. tab prenatal_depressed if has_prenatal == 1 & analysis_sample == 1
+
+   Prenatal |
+  depressed |
+  (combined |
+       A+B) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        804       94.92       94.92
+          1 |         43        5.08      100.00
+------------+-----------------------------------
+      Total |        847      100.00
+
+. 
+. /* Clean up temp files */
+. cap erase "$temp/w1_pregnancy.dta"
+
+. cap erase "$temp/w2_pregnancy.dta"
+
+. cap erase "$temp/w3_pregnancy.dta"
+
+. cap erase "$temp/pregnancy_panel.dta"
+
+. cap erase "$temp/w1_interview_date.dta"
+
+. cap erase "$temp/w2_interview_date.dta"
+
+. cap erase "$temp/w1_child_birthdates.dta"
+
+. cap erase "$temp/w2_child_birthdates.dta"
+
+. cap erase "$temp/w3_child_birthdates.dta"
+
+. cap erase "$temp/mother_k10_w1.dta"
+
+. cap erase "$temp/mother_k10_w2.dta"
+
+. cap erase "$temp/analysis_prenatal_step1.dta"
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/pallab.ghosh/Library/CloudStorage/Dropbox/D/Study/My_Papers
+> /OU/Health/Ghana_mental_health/maternal_depression_child_cog_devlopment/progr
+> ams/stata/Draft1_Feb2026_MH_Pregnancy/03_prenatal_depression.log
+  log type:  text
+ closed on:  22 Feb 2026, 10:31:12
+-------------------------------------------------------------------------------

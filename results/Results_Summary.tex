@@ -1,0 +1,474 @@
+\documentclass[12pt,a4paper]{article}
+
+% ============================================================
+% PACKAGES
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{mathpazo}                   % Palatino font (journal standard)
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}\onehalfspacing
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}                   % Professional tables
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{threeparttable}             % Table notes
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[labelfont=bf,font=small]{caption}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{microtype}                  % Better line breaking
+
+% ============================================================
+% TITLE
+% ============================================================
+\title{\textbf{Prenatal Depression and Child Cognitive \\ Development in Ghana} \\[12pt]
+\large Summary of Empirical Results}
+
+\author{Pallab Ghosh\thanks{Department of Economics, University of Oklahoma. Email: pghosh@ou.edu}}
+
+\date{February 2026 \\ \small Draft 1 --- Results Summary}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\noindent This document summarizes the empirical results from an analysis examining whether maternal depression \textit{during pregnancy} affects child cognitive development in Ghana. Using three waves of the Ghana Socioeconomic Panel Survey (GSPS, 2009--2018), we construct prenatal depression measures through two identification strategies: (A)~mothers who were pregnant at the time of Kessler Psychological Distress Scale (K10) measurement, and (B)~retrospective birth timing that links children born within 0--9 months of a previous wave's interview to the mother's K10 score at that wave. Combining both strategies yields 1,499 mother--child pairs with prenatal depression measures, of which 802 have child cognitive test data. Our main finding is that prenatal maternal depression has \textbf{no statistically significant effect} on child cognitive outcomes. In our preferred specification---EA fixed effects with wave fixed effects ($N = 724$, 150 EAs)---a one standard deviation increase in prenatal K10 is associated with a $-0.002$ SD change in the cognitive index ($p = 0.973$). This null result is robust across alternative timing windows (0--6 and 0--12 months), alternative cognitive outcomes (Raven's score), inclusion of concurrent (postnatal) depression as a control, and restriction to Strategy~A observations only. \\[6pt]
+\noindent \textit{JEL Classification}: I15, J13, O15 \\
+\noindent \textit{Keywords}: prenatal depression, child cognitive development, K10, fetal origins, Ghana
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ============================================================
+% SECTION 1: IDENTIFICATION STRATEGY
+% ============================================================
+\section{Identification Strategy and Variable Construction}
+\label{sec:strategy}
+
+\subsection{The Challenge}
+
+The GSPS does not include a dedicated prenatal depression module. The K10 depression scale is administered to adult household members at each survey wave, regardless of pregnancy status. To study prenatal depression, we must identify cases where a mother's K10 measurement coincided with a pregnancy. We employ two complementary strategies.
+
+\subsection{Strategy A: Pregnant at Time of K10 Interview}
+
+Each wave's fertility module asks women whether they are currently pregnant. If a mother reports being pregnant at the time of her K10 assessment, her K10 score is a direct measure of depression during pregnancy.
+
+\begin{itemize}[nosep]
+    \item Wave 1 (2009): 245 women currently pregnant (3.8\% of fertility respondents)
+    \item Wave 2 (2014): 189 women currently pregnant (3.5\%)
+    \item Wave 3 (2018): 240 women currently pregnant (4.2\%)
+\end{itemize}
+
+\subsection{Strategy B: Birth Timing (Retrospective)}
+
+For children observed in later waves, we compute the interval between the child's date of birth and the previous wave's interview date. If a child was born within 0--9 months of the previous wave's interview, the child was likely in utero at the time of the mother's K10 assessment, and the mother's K10 score from that wave serves as a prenatal depression measure.
+
+\medskip
+\noindent Formally, let $d_b$ denote the child's date of birth and $d_I^{t-1}$ the household's interview date in wave $t-1$. Define:
+\[
+\textit{MonthsSinceInterview} = \frac{d_b - d_I^{t-1}}{30.44}
+\]
+
+\noindent A child is classified as \textit{in utero during wave $t-1$} if $0 \leq \textit{MonthsSinceInterview} \leq 9$.
+
+\begin{itemize}[nosep]
+    \item Children in utero during Wave 1 interview: 592
+    \item Children in utero during Wave 2 interview: 191
+\end{itemize}
+
+\subsection{Combined Sample}
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Prenatal Depression Sample Construction}
+\label{tab:sample}
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & Strategy A & Strategy B & Combined \\
+\midrule
+Mother--child pairs with prenatal K10 & 1,059 & 470 & 1,499 \\
+\quad with child cognitive test data  & 641   & 169 & 802 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Strategy A identifies mothers pregnant at the time of K10 measurement. Strategy B uses birth timing to identify children in utero during a previous wave's K10 measurement. The combined sample removes duplicates where both strategies apply to the same mother--child pair.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection{Key Variables}
+
+\subsubsection*{Prenatal Depression Measures}
+
+\begin{enumerate}[nosep]
+    \item \textbf{Standardized prenatal K10} ($D_{m,\text{pre}}^{\text{std}}$): The mother's K10 score during pregnancy, standardized to mean zero and unit standard deviation within the prenatal sample. This is the primary measure; coefficients represent the effect of a one-standard-deviation increase in prenatal depression.
+
+    \item \textbf{Binary prenatal depression} ($\mathbb{1}[K10_{m,\text{pre}} \geq 30]$): Equals 1 if the mother's prenatal K10 score is 30 or above (indicating severe psychological distress).
+\end{enumerate}
+
+\subsubsection*{Dependent Variable}
+
+The primary outcome is the \textbf{composite cognitive index} ($\textit{CogIndex}_{it}$), the standardized average of all available cognitive test scores (Raven's progressive matrices, digit span forward, digit span backward, math, English). See the main results summary for detailed construction.
+
+\subsubsection*{Control Variables}
+
+\begin{itemize}[nosep]
+    \item \textbf{Child controls}: child age (continuous), child gender (female indicator)
+    \item \textbf{Maternal controls}: mother's age (harmonized across waves)
+    \item \textbf{Household controls}: household size, log per capita consumption
+\end{itemize}
+
+\noindent Mother's education is excluded from the control set because it is available for only $\sim$10\% of the sample and would severely restrict sample size (see the main results summary, Section~3.1, for a detailed discussion).
+
+\subsection{Fixed Effects and Standard Errors}
+
+\begin{itemize}[nosep]
+    \item $\alpha_e$: \textbf{EA fixed effects} (150 enumeration areas in the preferred specification)
+    \item $\delta_t$: \textbf{Wave fixed effects}
+    \item Standard errors \textbf{clustered at the EA level} throughout
+\end{itemize}
+
+% ============================================================
+% SECTION 2: SUMMARY STATISTICS
+% ============================================================
+\section{Summary Statistics}
+\label{sec:sumstats}
+
+\subsection{Prenatal Depression Distribution}
+
+Table~\ref{tab:prenatal_stats} describes the prenatal depression measures in the combined sample.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Prenatal Depression: Summary Statistics}
+\label{tab:prenatal_stats}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Variable & $N$ & Mean & Std.\ Dev. & Range \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Panel A: Prenatal Depression Measures}} \\[2pt]
+Prenatal K10 score (10--50)           & 1,499 & 19.42 & 5.86 & 10--42 \\
+Severely depressed (K10 $\geq$ 30) & 1,499 & 0.052 & ---  & 0--1 \\[4pt]
+\multicolumn{5}{@{}l}{\textit{Panel B: Prevalence by Classification}} \\[2pt]
+\quad Not severely depressed (K10 $<$ 30) & 1,421 & \multicolumn{3}{c}{94.8\% of prenatal sample} \\
+\quad Severely depressed (K10 $\geq$ 30)  & 78 & \multicolumn{3}{c}{5.2\% of prenatal sample} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Combined Strategy A and B sample. K10 range is 10--50; scores $\geq$30 indicate severe psychological distress.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent Severe prenatal depression prevalence is 5.2\% (K10 $\geq$ 30), compared to 45.8\% using the standard K10 $\geq$ 20 cutoff. The mean prenatal K10 score is 19.42 (SD $= 5.86$), with a maximum of 42.
+
+\subsection{Unconditional Comparisons}
+
+Table~\ref{tab:ttest} compares cognitive outcomes and child age between children with and without prenatal depression exposure.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Cognitive Outcomes: Children With vs.\ Without Prenatal Depression Measures}
+\label{tab:ttest}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & Unexposed & Exposed & Difference & $t$-stat \\
+ & (no prenatal & (has prenatal & & \\
+ & measure) & measure) & & \\
+\midrule
+Cognitive index (std.) & 0.016 & $-$0.168 & 0.184$^{***}$ & (5.50) \\
+ & [$N = 11{,}705$] & [$N = 802$] & & \\[4pt]
+Child age (years) & 10.57 & 8.99 & 1.58$^{***}$ & (12.17) \\
+ & [$N = 12{,}899$] & [$N = 847$] & & \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: ``Exposed'' = children with a prenatal depression measure (Strategy A or B). ``Unexposed'' = children in the analysis sample without a prenatal measure. $t$-statistics in parentheses. $^{***}$~$p<0.01$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent Children with prenatal depression measures score 0.18 SD lower on the cognitive index ($p < 0.001$). However, they are also \textbf{1.6 years younger} on average (8.99 vs.\ 10.57 years, $p < 0.001$). This age composition difference---not prenatal depression \textit{per se}---drives the raw cognitive gap. Once child age and other controls are included in the regression models, the association vanishes entirely (see Section~\ref{sec:results}).
+
+% ============================================================
+% SECTION 3: MAIN ESTIMATION RESULTS
+% ============================================================
+\section{Main Estimation Results}
+\label{sec:results}
+
+\subsection{Estimation Equations}
+
+We estimate the following specifications:
+
+\medskip
+\noindent\textbf{Column (1) --- Bivariate OLS:}
+\[
+\textit{CogIndex}_{it} = \beta_0 + \beta_1 D_{m,\text{pre}}^{\text{std}} + \varepsilon_{it}
+\]
+
+\noindent\textbf{Column (2) --- OLS with controls:}
+\[
+\textit{CogIndex}_{it} = \beta_0 + \beta_1 D_{m,\text{pre}}^{\text{std}} + \mathbf{X}_{it}^{c\prime}\boldsymbol{\gamma} + \beta_3 \textit{MAge}_{mt} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{it}
+\]
+
+\noindent\textbf{Column (3) --- EA fixed effects (preferred specification):}
+\begin{equation}
+\label{eq:eafe_pre}
+\textit{CogIndex}_{it} = \alpha_e + \delta_t + \beta_1 D_{m,\text{pre}}^{\text{std}} + \mathbf{X}_{it}^{c\prime}\boldsymbol{\gamma} + \beta_3 \textit{MAge}_{mt} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{it}
+\end{equation}
+
+\noindent\textbf{Column (4) --- Binary prenatal depression:}
+\[
+\textit{CogIndex}_{it} = \alpha_e + \delta_t + \beta_1 \mathbb{1}[K10_{m,\text{pre}} \geq 30] + \mathbf{X}_{it}^{c\prime}\boldsymbol{\gamma} + \beta_3 \textit{MAge}_{mt} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{it}
+\]
+
+\noindent\textbf{Column (5) --- Prenatal + concurrent depression:}
+\begin{equation}
+\label{eq:both}
+\textit{CogIndex}_{it} = \alpha_e + \delta_t + \beta_1 D_{m,\text{pre}}^{\text{std}} + \beta_2 D_{mt}^{\text{std}} + \mathbf{X}_{it}^{c\prime}\boldsymbol{\gamma} + \beta_3 \textit{MAge}_{mt} + \mathbf{X}_{ht}^{h\prime}\boldsymbol{\psi} + \varepsilon_{it}
+\end{equation}
+where $D_{mt}^{\text{std}}$ is the mother's concurrent (postnatal) K10 depression score. This specification tests whether prenatal and postnatal depression have independent effects.
+
+\subsection{Effect of Prenatal Depression on Composite Cognitive Index}
+
+Table~\ref{tab:main} reports the main results.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Effect of Prenatal Depression on Child Cognitive Development}
+\label{tab:main}
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+ & (1) & (2) & (3) & (4) & (5) \\
+ & OLS & OLS & EA FE & EA FE & EA FE \\
+ &  & +Controls & (Preferred) & (Binary) & (+Concurrent) \\
+\midrule
+Prenatal dep.\ (std.\ K10) & $-$0.007 & $-$0.009 & $-$0.002 &  & $-$0.027 \\
+ & (0.042) & (0.038) & (0.052) &  & (0.057) \\[3pt]
+Severely depressed & & & & 0.184 & \\
+\quad (K10 $\geq$ 30) & & & & (0.263) & \\[3pt]
+Concurrent dep.\ (std.\ K10) & & & & & 0.035 \\
+ & & & & & (0.053) \\[4pt]
+\midrule
+Controls & No & Yes & Yes & Yes & Yes \\
+EA FE & No & No & Yes & Yes & Yes \\
+Wave FE & No & No & Yes & Yes & Yes \\
+Observations & 779 & 779 & 724 & 724 & 724 \\
+$R^2$ & 0.000 & 0.071 & 0.297 & 0.298 & 0.297 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level in parentheses. Dependent variable: composite cognitive index (standardized). Prenatal depression identified via Strategy A (pregnancy at interview) and Strategy B (birth timing, 0--9 month window). Controls: child age, child gender, mother's age, household size, log per capita consumption. 150 EA fixed effects in Columns~(3)--(5). $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent The central finding is clear: \textbf{prenatal maternal depression has no statistically significant effect on child cognitive outcomes across any specification}.
+
+\begin{itemize}
+    \item \textbf{Column (1), bivariate OLS} ($N = 779$): $\hat{\beta}_1 = -0.007$ (SE $= 0.042$, $p = 0.870$). The raw association is essentially zero.
+
+    \item \textbf{Column (2), OLS with controls}: Adding child age, gender, mother's age, household size, and log per capita consumption barely changes the estimate ($\hat{\beta}_1 = -0.009$, $p = 0.808$). The $R^2$ increases from 0.000 to 0.071, driven entirely by the control variables.
+
+    \item \textbf{Column (3), EA fixed effects (preferred)}: $\hat{\beta}_1 = -0.002$ (SE $= 0.052$, $p = 0.973$). The coefficient is indistinguishable from zero. With 150 EA fixed effects absorbing time-invariant local characteristics, $R^2$ rises to 0.297. The 95\% confidence interval is [$-0.104$, $+0.100$], meaning we cannot rule out effects up to $\pm$0.10 SD, but the point estimate is economically negligible.
+
+    \item \textbf{Column (4), binary prenatal depression}: $\hat{\beta}_1 = 0.184$ (SE $= 0.263$, $p = 0.486$). Being classified as severely prenatally depressed (K10 $\geq$ 30) has no significant effect on child cognition. The larger point estimate reflects the small number of severely depressed mothers (5.2\% of the prenatal sample), resulting in a very imprecise estimate.
+
+    \item \textbf{Column (5), prenatal + concurrent depression}: Neither prenatal depression ($\hat{\beta}_1 = -0.027$, $p = 0.641$) nor concurrent postnatal depression ($\hat{\beta}_2 = 0.035$, $p = 0.510$) significantly predicts cognitive outcomes when both are included simultaneously. This rules out the possibility that the prenatal null was masking a concurrent depression effect (or vice versa).
+\end{itemize}
+
+% ============================================================
+% SECTION 4: SENSITIVITY ANALYSES
+% ============================================================
+\section{Sensitivity Analyses}
+
+Table~\ref{tab:sensitivity} examines the robustness of the null result to alternative timing windows, outcome measures, and identification strategies.
+
+\medskip
+\noindent\textbf{Column (1) --- Baseline:} Eq.~\eqref{eq:eafe_pre} with the 0--9 month timing window (same as Table~\ref{tab:main}, Column~3).
+
+\noindent\textbf{Column (2) --- 6-month window:} Strategy B restricted to children born within 0--6 months of the previous wave's interview (stricter criterion: child was certainly in utero during the interview).
+
+\noindent\textbf{Column (3) --- 12-month window:} Strategy B extended to children born within 0--12 months (more inclusive criterion: allows for imprecise birth dates).
+
+\noindent\textbf{Column (4) --- Raven's score:} Eq.~\eqref{eq:eafe_pre} with standardized Raven's progressive matrices score as the dependent variable (replacing the composite index).
+
+\noindent\textbf{Column (5) --- Controlling for concurrent depression:} Same as Table~\ref{tab:main}, Column~5 (Eq.~\ref{eq:both}).
+
+\noindent\textbf{Column (6) --- Strategy A only:} Eq.~\eqref{eq:eafe_pre} restricted to mothers identified as pregnant at the time of K10 measurement (excludes birth-timing identifications).
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Prenatal Depression: Sensitivity Analyses}
+\label{tab:sensitivity}
+\small
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+ & (1) & (2) & (3) & (4) & (5) & (6) \\
+ & Baseline & 6-mo & 12-mo & Raven's & +Current & Strat.\ A \\
+ & (0--9 mo) & window & window & only & dep. & only \\
+\midrule
+Prenatal dep.\ (std.\ K10) & $-$0.002 & & & $-$0.003 & $-$0.027 & 0.049 \\
+ & (0.052) & & & (0.057) & (0.057) & (0.069) \\[3pt]
+Prenatal dep.\ (6-mo) & & $-$0.049 & & & & \\
+ & & (0.056) & & & & \\[3pt]
+Prenatal dep.\ (12-mo) & & & $-$0.027 & & & \\
+ & & & (0.039) & & & \\[3pt]
+Concurrent dep.\ (std.\ K10) & & & & & 0.035 & \\
+ & & & & & (0.053) & \\[4pt]
+\midrule
+Timing window & 0--9 mo & 0--6 mo & 0--12 mo & 0--9 mo & 0--9 mo & Strat.\ A \\
+Outcome & Cog Index & Cog Index & Cog Index & Raven's & Cog Index & Cog Index \\
+No.\ of EAs & 150 & 15 & 46 & 150 & 150 & 131 \\
+Observations & 724 & 33 & 104 & 724 & 724 & 590 \\
+$R^2$ & 0.297 & 0.952 & 0.738 & 0.262 & 0.297 & 0.292 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Standard errors clustered at the EA level in parentheses. All models include EA and wave fixed effects plus full controls (child age, child gender, mother's age, household size, log per capita consumption). $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent The null result is robust across all sensitivity checks:
+
+\begin{itemize}
+    \item \textbf{Timing windows}: The 6-month window (Column~2, $N = 33$) yields $\hat{\beta}_1 = -0.049$ ($p = 0.399$) and the 12-month window (Column~3, $N = 104$) yields $\hat{\beta}_1 = -0.027$ ($p = 0.492$). Both are insignificant, though the extremely small sample sizes---particularly for the 6-month window (33 observations, 15 EAs)---limit the informativeness of these specifications. The very high $R^2$ values (0.952 and 0.738) reflect EA fixed effects absorbing nearly all variation in these tiny samples.
+
+    \item \textbf{Raven's score} (Column~4): Using non-verbal fluid intelligence alone as the outcome yields $\hat{\beta}_1 = -0.003$ ($p = 0.952$), confirming the null is not an artifact of the composite index construction.
+
+    \item \textbf{Concurrent depression control} (Column~5): Neither prenatal ($-0.027$, $p = 0.641$) nor concurrent depression ($0.035$, $p = 0.510$) predicts cognition.
+
+    \item \textbf{Strategy A only} (Column~6, $N = 590$): Restricting to mothers identified as pregnant at the time of K10 measurement yields $\hat{\beta}_1 = 0.049$ ($p = 0.476$). The sign flips to positive but remains insignificant, consistent with a true zero effect.
+\end{itemize}
+
+% ============================================================
+% SECTION 5: DISCUSSION
+% ============================================================
+\section{Discussion}
+
+\subsection{Summary of Key Findings}
+
+Table~\ref{tab:summary} consolidates the key findings.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Summary of Key Findings: Prenatal Depression Analysis}
+\label{tab:summary}
+\small
+\begin{tabular}{@{}p{5cm}p{4cm}cc@{}}
+\toprule
+Specification & Description & $\hat{\beta}_1$ & Sig.? \\
+\midrule
+\multicolumn{4}{@{}l}{\textit{Table P1: Main Results}} \\[2pt]
+\quad OLS, no controls & Bivariate & $-$0.007 & No \\
+\quad OLS, full controls & With demographics & $-$0.009 & No \\
+\quad EA FE (preferred) & Within-EA variation & $-$0.002 & No \\
+\quad EA FE, binary dep. & Severe (K10 $\geq$ 30) & 0.184 & No \\
+\quad EA FE, both measures & Prenatal + concurrent & $-$0.027 & No \\[4pt]
+\multicolumn{4}{@{}l}{\textit{Table P2: Sensitivity Analyses}} \\[2pt]
+\quad 6-month window & Stricter timing & $-$0.049 & No \\
+\quad 12-month window & Looser timing & $-$0.027 & No \\
+\quad Raven's score only & Non-verbal IQ & $-$0.003 & No \\
+\quad +Concurrent depression & Both measures & $-$0.027 & No \\
+\quad Strategy A only & Pregnant at interview & 0.049 & No \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: $\hat{\beta}_1$ is the coefficient on the prenatal depression measure. All EA FE specifications include wave fixed effects and full controls. $^{***}$~$p<0.01$, $^{**}$~$p<0.05$, $^{*}$~$p<0.10$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection{Interpretation}
+
+The main takeaways are as follows.
+
+\begin{enumerate}
+    \item \textbf{Prenatal depression has no significant effect on child cognitive development.} In the preferred EA fixed effects specification ($N = 724$, 150 EAs), a one standard deviation increase in prenatal K10 is associated with a $-0.002$ SD change in the cognitive index ($p = 0.973$). The point estimate is economically negligible and statistically indistinguishable from zero. This null holds across all 10 specifications examined.
+
+    \item \textbf{The raw cognitive gap is entirely driven by age composition.} Children with prenatal depression measures score 0.18 SD lower on the cognitive index in raw comparisons ($p < 0.001$), but they are also 1.6 years younger on average. Once child age enters the model, the association vanishes.
+
+    \item \textbf{Concurrent (postnatal) depression is also unrelated to child cognition.} When prenatal and concurrent depression are included simultaneously (Column~5 of Table~\ref{tab:main}), neither predicts cognitive outcomes. This is consistent with the main analysis finding from the full GSPS sample ($N \approx 12{,}000$) where concurrent depression shows a precisely estimated null ($\hat{\beta}_1 = 0.002$, SE $= 0.010$).
+
+    \item \textbf{The null is robust but imprecisely estimated.} With a standard error of $\sim$0.052 in the preferred specification, we can rule out effects larger than $\pm$0.10 SD at the 95\% confidence level. This means we cannot definitively exclude modest prenatal depression effects of, say, 0.05--0.10 SD. However, such effects would be small in practical terms.
+
+    \item \textbf{Sample size limitations deserve acknowledgment.} The prenatal analysis sample ($N = 724$ in the preferred specification) is substantially smaller than the full GSPS sample ($N \approx 12{,}000$). The 6-month timing window yields only 33 observations. These small samples limit statistical power, particularly for detecting modest effect sizes.
+\end{enumerate}
+
+\subsection{Why Might Prenatal Depression Not Affect Child Cognition?}
+
+Several factors may explain the null result:
+
+\begin{enumerate}[nosep]
+    \item \textbf{Measurement timing.} The K10 captures depression at a single point during pregnancy. Prenatal depression may be transient, and a single cross-sectional measure may not capture the chronic in-utero exposure that fetal programming theories predict would affect neurodevelopment.
+
+    \item \textbf{Postnatal environment dominance.} If postnatal caregiving quality, household environment, and community factors matter more for cognitive development than in-utero biological exposure, prenatal depression effects would be overwhelmed by postnatal influences. The Ghanaian context---with extended family structures and shared childcare responsibilities---may provide particularly strong postnatal buffering.
+
+    \item \textbf{Measurement error in prenatal identification.} Both strategies introduce noise. Strategy~A relies on self-reported pregnancy status at the interview date (which may not coincide with the most sensitive gestational periods). Strategy~B uses a 9-month window that may incorrectly classify some children. This measurement error attenuates estimated effects toward zero.
+
+    \item \textbf{Consistency with concurrent depression results.} The null prenatal result is fully consistent with the broader finding from the main analysis that \textit{concurrent} maternal depression also has no effect on child cognition in this sample. If depression---whether prenatal or postnatal---does not predict cognitive outcomes, the mechanism is unlikely to be specific to the prenatal period.
+\end{enumerate}
+
+\subsection{Comparison with the Main (Concurrent Depression) Analysis}
+
+The prenatal analysis complements the main analysis of concurrent maternal depression reported separately. Table~\ref{tab:comparison} compares the two sets of findings.
+
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Comparison: Prenatal vs.\ Concurrent Depression Effects on Child Cognition}
+\label{tab:comparison}
+\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & Prenatal & Concurrent & Concurrent \\
+ & (this analysis) & (EA FE, full) & (Child FE) \\
+\midrule
+$\hat{\beta}_1$ (std.\ K10) & $-$0.002 & 0.002 & 0.014 \\
+SE & (0.052) & (0.010) & (0.019) \\
+$p$-value & 0.973 & 0.834 & 0.462 \\
+$N$ & 724 & 11,958 & 6,583 \\
+No.\ of EAs & 150 & 334 & --- \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes}: Prenatal depression results from Eq.~\eqref{eq:eafe_pre} (this document). Concurrent depression results from the main analysis (EA and child FE specifications, full sample). All coefficients represent the effect of a one SD increase in K10 on the cognitive index.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\noindent Both analyses yield the same conclusion: maternal depression---whether measured prenatally or concurrently---has no detectable effect on child cognitive development in this Ghanaian sample. The concurrent analysis benefits from much greater statistical power (SE $= 0.010$ vs.\ 0.052) due to the larger sample, yielding a more precisely estimated null. The prenatal analysis, while less precise, confirms that the null extends to the biologically critical in-utero period.
+
+\vspace{12pt}
+\noindent\rule{\textwidth}{0.5pt}
+\vspace{4pt}
+\noindent \textit{Data}: Ghana Socioeconomic Panel Survey (GSPS), Waves 1--3 (2009, 2014, 2018). Prenatal sample: $N = 1{,}499$ mother--child pairs with prenatal K10; $N = 724$ in preferred EA FE specification. \\
+\noindent \textit{Standard errors}: Clustered at the enumeration area (EA) level throughout. \\
+\noindent \textit{Complete tables}: Available in \texttt{All\_Tables.pdf} (Tables P1--P2).
+
+\end{document}
