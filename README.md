@@ -76,9 +76,15 @@ The repository also includes a **prenatal depression analysis** that identifies 
 │       ├── Results_Summary.tex
 │       ├── TableP1_PrenatalDepression.*
 │       └── TableP2_PrenatalSensitivity.*
-└── draft/
-    ├── Results_Summary.pdf        # Full narrative summary of main analysis
-    └── Results_Summary.tex
+├── draft/
+│   ├── Results_Summary.pdf        # Full narrative summary of main analysis
+│   └── Results_Summary.tex
+└── references/                    # Key literature
+    ├── baranov-et-al-2020-maternal-depression-womens-empowerment-...pdf
+    ├── JHR_2016_Anna_Aizer.pdf
+    ├── JHR_2020.pdf
+    ├── NBER 2016.pdf
+    └── persson-rossin-slater-2018-family-ruptures-stress-...pdf
 ```
 
 ## Results Tables
@@ -160,6 +166,14 @@ The repository also includes a **prenatal depression analysis** that identifies 
 | Prenatal: EA FE | -0.002 | (0.052) | 0.973 | 724 |
 
 \*\* p < 0.05
+
+## Key References
+
+The `references/` folder contains key papers from the literature on maternal mental health and child development:
+
+- **Baranov et al. (2020)** -- "Maternal Depression, Women's Empowerment, and Parental Investment: Evidence from a Randomized Controlled Trial." *American Economic Review*. Randomized evidence from Pakistan on how treating maternal depression affects parental investment and child outcomes.
+- **Aizer (2016)** -- *Journal of Human Resources*. Examines the causal effect of maternal stress during pregnancy on child outcomes.
+- **Persson & Rossin-Slater (2018)** -- "Family Ruptures, Stress, and the Mental Health of the Next Generation." *American Economic Review*. Studies how prenatal maternal stress from family ruptures affects children's mental health.
 
 ## Citation
 
